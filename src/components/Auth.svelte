@@ -1,38 +1,43 @@
 <script lang="ts">
     import {fade} from "svelte/transition"
-    // import ErrorAlert from "./ErrorAlert.svelte";
+    import ErrorAlert from "./ErrorAlert.svelte";
 
     // export let authMode: "login" | "register" = "register";
     let isAuthenticated = false;
     let err: string | null = null;
 
-    function login() {}
+    function login() {
+        console.log("logging in...")
+    }
 
-    function register() {}
+    // function register() {}
 
-    function logout() {}
+    function logout() {
+        console.log("Logging out...")
+    }
 
-    function google() {}
+    // function google() {}
 </script>
 
 <div class="container">
     {#if !isAuthenticated}
+    <h3>Log In</h3>
+    {#if err}
+    <ErrorAlert message={err} />
+    {/if}
+    <form in:fade on:submit|preventDefault={login}>
+        <div class="row">
+            <label for="phoneNo">Phone Number</label>
+            <input class="u-full-width" type="email" placeholder="91234567" id="phoneNo">
+        </div>
+        <div class="row">
+            <input class="button-primary" type="submit" value="Login">
+        </div>
+    </form>
+    {:else}
+    <h2>Logged In</h2>
     <div class="row">
-        <h3>Log In</h3>
-        <form>
-            <div class="row">
-                <label for="exampleEmailInput">Email</label>
-                <input class="u-full-width" type="email" placeholder="test@mailbox.com" id="emailInput">
-            </div>
-            <div class="row">
-                <label for="exampleEmailInput">Password</label>
-                <input class="u-full-width" type="password" placeholder="*********" id="passwordInput">
-            </div>
-            <div class="row">
-                <input class="button-primary" type="button" value="Submit">
-                <input class="button" type="button" value="Register">
-            </div>
-          </form>
+        <button class="button-primary" type="button" value="Logout" on:click={logout}>
     </div>
     {/if}
 </div>
