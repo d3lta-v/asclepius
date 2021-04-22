@@ -1,7 +1,7 @@
 <script lang="ts">
     // =======================================================================
     // Imports
-    import {fade} from "svelte/transition"
+    import {fade, slide} from "svelte/transition"
     import ErrorAlert from "./ErrorAlert.svelte";
     import firebase from "firebase/app";
     import {auth} from "../services/firebase";
@@ -20,10 +20,13 @@
     // =======================================================================
     // UI elements
     let ui_errorMessageDisplay: string | null = null;
-    let ui_phoneNumberField = document.getElementById("i_phoneNo") as HTMLInputElement;
+    let ui_phoneNumberField: HTMLInputElement;
+    let ui_verificationNumberField: HTMLInputElement;
 
     onMount(() => {
+        ui_phoneNumberField = document.getElementById("i_phoneNo") as HTMLInputElement;
         // Create CAPTCHA
+        // TODO: might need to redo this every time after user logs out due to reCAPTCHA client element has been removed: 0
         appVerifier = new firebase.auth.RecaptchaVerifier('i_login', {
             'size': 'invisible',
             'callback': (response) => {
@@ -54,23 +57,32 @@
         }
         phoneNo = "+65" + phoneNo.trim();
 
+        console.log("App captcha verifier: ", appVerifier);
         auth.signInWithPhoneNumber(phoneNo, appVerifier)
         .then((confirmationResult) => {
-            // SMS sent. Prompt user to type the code from the message, then sign the
-            // user in with confirmationResult.confirm(code).
-            // window.confirmationResult = confirmationResult;
-            return confirmationResult.confirm("123456").then((result) => {
-                const user = result.user;
-                console.log("User logged in as ", user);
-                isAuthenticated = true;
-            }).catch((error) => {
-                // User couldn't sign in (bad verification code?)
-                // ...
-                console.error(error);
-            });
+            // SMS sent. Prompt user to type the code from the message, then sign the user in with 
+            // confirmationResult.confirm(code).
+            captchaConfirmation = confirmationResult; // This triggers a UI change automatically
         }).catch((error) => {
             // Due to some error, SMS was not sent
             console.error(error);
+            ui_errorMessageDisplay = error;
+        });
+    }
+
+    function confirmCaptchaCallback() {
+        ui_verificationNumberField = document.getElementById("i_verificationNo") as HTMLInputElement;
+        // TODO: should do some basic validation
+        captchaConfirmation.confirm(ui_verificationNumberField.value).then((result) => {
+            const user = result.user;
+            console.log("User logged in as ", user);
+            isAuthenticated = true;
+        }).catch((error) => {
+            // User couldn't sign in (bad verification code?)
+            // ...
+            // TODO: show error to user
+            console.error(error);
+            ui_errorMessageDisplay = error;
         });
     }
 
@@ -102,13 +114,22 @@
     {/if}
     <form in:fade on:submit|preventDefault={login}>
         <div class="row">
-            <div class="four columns">
+            <div class="three columns">
                 <label for="i_phoneNo">Phone Number</label>
                 <input class="u-full-width" type="tel" placeholder="91234567" id="i_phoneNo" style="margin-bottom: 1em;">
                 <input class="button-primary" type="submit" value="Login" id="i_login">
             </div>
         </div>
     </form>
+    {#if captchaConfirmation}
+    <div transition:slide class="row">
+        <div class="three columns">
+            <label for="i_verificationNo" style="margin-top: 0.5em;">Verification Code:</label>
+            <input class="u-full-width" type="text" placeholder="123456" id="i_verificationNo" style="margin-bottom: 1em;">
+            <button on:click={confirmCaptchaCallback}>Verify</button>
+        </div>
+    </div>
+    {/if}
     {:else}
     <h2>Logged In</h2>
     <div class="row">
