@@ -4,8 +4,7 @@
 
 <div class="container">
     <div class="row">
-        <h2>Asclepius Temperature Recording Portal</h2>
-        <p>Please log in</p>
+        <h5 style="margin-top: 1em;">Asclepius Temperature Recording Portal</h5>
     </div>
 </div>
 
