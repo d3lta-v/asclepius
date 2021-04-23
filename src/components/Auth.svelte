@@ -23,10 +23,20 @@
     let ui_phoneNumberField: HTMLInputElement;
     let ui_verificationNumberField: HTMLInputElement;
 
+    // =======================================================================
+    // Lifecycle
     onMount(() => {
+        console.log("onMount called");
         ui_phoneNumberField = document.getElementById("i_phoneNo") as HTMLInputElement;
         // Create CAPTCHA
         // TODO: might need to redo this every time after user logs out due to reCAPTCHA client element has been removed: 0
+        createCaptchaVerifier();
+    });
+
+    // =======================================================================
+    // Functions
+
+    function createCaptchaVerifier() {
         appVerifier = new firebase.auth.RecaptchaVerifier('i_login', {
             'size': 'invisible',
             'callback': (response) => {
@@ -40,13 +50,14 @@
                 ui_errorMessageDisplay = "reCAPTCHA error, please solve reCAPTCHA again";
             }
         });
-    });
-
-    // =======================================================================
-    // Functions
+    }
 
     function login() {
         ui_errorMessageDisplay = null; // reset error message display
+        // Create captcha instance if it's null
+        if (!appVerifier) {
+            createCaptchaVerifier();
+        }
         console.log("logging in...");
         let phoneNo = ui_phoneNumberField.value;
         // perform some input validation
@@ -91,6 +102,10 @@
     function logout() {
         ui_errorMessageDisplay = null;
         console.log("Logging out...")
+        // destroy the captcha instance so that we can recreate it next time
+        appVerifier.clear();
+        appVerifier = null;
+        // Actually sign out
         if (auth.currentUser) {
             auth.signOut().then(() => {
                 // Sign-out successful.
@@ -122,7 +137,7 @@
         </div>
     </form>
     {#if captchaConfirmation}
-    <div transition:slide class="row">
+    <div in:slide class="row">
         <div class="three columns">
             <label for="i_verificationNo" style="margin-top: 0.5em;">Verification Code:</label>
             <input class="u-full-width" type="text" placeholder="123456" id="i_verificationNo" style="margin-bottom: 1em;">
