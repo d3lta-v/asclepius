@@ -103,6 +103,7 @@
         ui_errorMessageDisplay = null;
         console.log("Logging out...")
         // destroy the captcha instance so that we can recreate it next time
+        captchaConfirmation = null;
         appVerifier.clear();
         appVerifier = null;
         // Actually sign out
