@@ -88,6 +88,9 @@
             const user = result.user;
             console.log("User logged in as ", user);
             isAuthenticated = true;
+            // Dispatch login event
+            d("auth");
+            d("done");
         }).catch((error) => {
             // User couldn't sign in (bad verification code?)
             // ...
@@ -111,6 +114,9 @@
             auth.signOut().then(() => {
                 // Sign-out successful.
                 console.log("User signed out");
+                // Dispatch logout event
+                d("logout");
+                d("done");
                 isAuthenticated = false;
             }).catch((error) => {
                 // An error happened.
@@ -147,8 +153,8 @@
     </div>
     {/if}
     {:else}
-    <h2>Logged In</h2>
     <div class="row">
+        <h5>Logout</h5>
         <button class="button-primary" type="button" value="Logout" on:click={logout}>
     </div>
     {/if}

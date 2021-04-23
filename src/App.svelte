@@ -2,6 +2,7 @@
     import router from "page";
     import Index from "./routes/index.svelte";
     import NotFound from "./routes/notfound.svelte";
+    import Temp from "./routes/temp.svelte";
 
     // Variables
     let page;
@@ -13,8 +14,9 @@
     router("/404/:msg", (ctx: {params: {}, querystring: string}, next) => {
         params = ctx.params;
         next();
-    }, () => page = NotFound)
-    router("/*", () => page = NotFound)
+    }, () => page = NotFound);
+    router("/temp", () => page = Temp);
+    router("/*", () => page = NotFound);
 
     router.start();
 </script>
