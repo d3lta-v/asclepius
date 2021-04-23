@@ -8,4 +8,4 @@
     </div>
 </div>
 
-<Auth />
+<Auth on:auth={() => window.location.href = "/chat"} />
