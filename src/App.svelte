@@ -13,8 +13,8 @@
     router("/404/:msg", (ctx: {params: {}, querystring: string}, next) => {
         params = ctx.params;
         next();
-    }, () => page = Index)
-    router("/*", () => page = Index)
+    }, () => page = NotFound)
+    router("/*", () => page = NotFound)
 
     router.start();
 </script>
