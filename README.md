@@ -33,6 +33,14 @@ By default, the server will only respond to requests from localhost. To allow co
 
 If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
 
+## Database design and security
+
+This application uses Firebase Cloud Firestore. The security of the database is handled entirely in the server as per Firebase's design. Some basic principals applies:
+
+1. Temperature records are r/w by owner + admin ONLY.
+2. Mapping are r/w by admin ONLY.
+3. Database is NOT to be publically read.
+
 ## Building and running in production mode
 
 To create an optimised version of the app:
