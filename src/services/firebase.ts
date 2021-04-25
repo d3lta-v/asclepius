@@ -9,7 +9,6 @@ firebase.initializeApp(config);
 
 // Auth
 export const auth = firebase.auth();
-// export const googleAuth = new firebase.auth.GoogleAuthProvider();
 // export const emailAuth = new firebase.auth.EmailAuthProvider();
 export const phoneAuthProvider = new firebase.auth.PhoneAuthProvider();
 

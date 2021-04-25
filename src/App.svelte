@@ -3,9 +3,10 @@
     import Index from "./routes/index.svelte";
     import NotFound from "./routes/notfound.svelte";
     import Temp from "./routes/temp.svelte";
+    import Admin from "./routes/admin.svelte";
 
     // Variables
-    let page;
+    let page: any;
     let params = {};
     let qs = {};
 
@@ -16,6 +17,7 @@
         next();
     }, () => page = NotFound);
     router("/temp", () => page = Temp);
+    router("/admin", () => page = Admin);
     router("/*", () => page = NotFound);
 
     router.start();
