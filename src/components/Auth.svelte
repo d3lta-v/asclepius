@@ -160,8 +160,9 @@
     {/if}
     {:else}
     <div class="row">
-        <h5>Logout</h5>
-        <button class="button-primary" type="button" value="Logout" on:click={logout}>
+        <h5>Logged in</h5>
+        <p>You are being redirected to the correct page right now... if this takes too long, you can try to log out and try again with the log out button below:</p>
+        <button class="button-primary" type="button" on:click={logout}>Logout</button>
     </div>
     {/if}
 </div>
