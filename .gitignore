@@ -3,5 +3,6 @@
 /src/firebase_config.ts
 
 .firebaserc
+.firebase/
 
 .DS_Store
