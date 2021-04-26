@@ -33,6 +33,12 @@
         createCaptchaVerifier();
     });
 
+    // This will check when the authentication state changes so that the user gets directed to the right place
+    auth.onAuthStateChanged(user => {
+        isAuthenticated = !!user;
+        if (user) d("auth");
+    });
+
     // =======================================================================
     // Functions
 
