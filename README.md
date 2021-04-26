@@ -52,6 +52,21 @@ Ultrausers **MUST** be protected with 2nd factor authentication to ensure that d
 
 The source code is publicly auditable on this website, Github. Infosec researchers are welcome to audit this source code.
 
+### Compliance with PDPA regulations
+
+The ten obligations as required by the PDPA shall be complied with:
+
+1. Consent Obligation - The user is informed of the use of their phone number prior to first use
+2. Purpose Limitation Obligation - The purpose of data collection is minimal, and limited in scope
+3. Notification Obligation - Inform the user when their personal data is being collected
+4. Access and Correction Obligation - Provide a data policy page regarding the collection and usage of said personal data
+5. Accuracy Obligation - Phone numbers are used for authentication and are hence relatively accurate
+6. Protection Obligation - Data security measures are put in place as highlighted in the sections above
+7. Retention Limitation Obligation - Features will be implemented to purge temperature records older than 1 year and users older than 2 years using [Firebase Cloud Functions](https://medium.com/firebase-developers/how-to-schedule-a-cloud-function-to-run-in-the-future-in-order-to-build-a-firestore-document-ttl-754f9bf3214a)
+8. Transfer Limitation Obligation - Not applicable
+9. Data Breach Notification Obligation - Not applicable
+10. Accountability Obligation - Over here! We have documented all of our security and processes right here in this repository
+
 ## Building and running in production mode
 
 To create an optimised version of the app:

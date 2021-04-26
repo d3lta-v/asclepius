@@ -12,7 +12,6 @@
     // Variables and constants
     const d = createEventDispatcher();
 
-    // export let authMode: "login" | "register" = "register";
     let isAuthenticated = false;
     let captchaConfirmation: firebase.auth.ConfirmationResult = null;
     let appVerifier: firebase.auth.RecaptchaVerifier = null;
