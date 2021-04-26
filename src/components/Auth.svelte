@@ -46,8 +46,8 @@
             'size': 'invisible',
             'callback': (response) => {
                 console.log("CAPTCHA solved: ", response);
-                // reCAPTCHA solved, allow signInWithPhoneNumber.
-                // onSignInSubmit();
+                // reCAPTCHA solved, initialise the login flow from here
+                login();
             },
             'expired-callback': () => {
                 // Response expired. Ask user to solve reCAPTCHA again.
@@ -55,15 +55,14 @@
                 ui_errorMessageDisplay = "reCAPTCHA error, please solve reCAPTCHA again";
             }
         });
+
+        // Pre-render CAPTCHA widget
+        appVerifier.render();
     }
 
     function login() {
         ui_errorMessageDisplay = null; // reset error message display
-        // Create captcha instance if it's null
-        if (!appVerifier) {
-            createCaptchaVerifier();
-        }
-        console.log("logging in...");
+
         let phoneNo = ui_phoneNumberField.value;
         // perform some input validation
         const phoneNoValid = phoneNo.length == 8 && (phoneNo.startsWith("8") || phoneNo.startsWith("9") || phoneNo.startsWith("7"));
@@ -93,7 +92,7 @@
             const user = result.user;
             console.log("User logged in as ", user);
             isAuthenticated = true;
-            // Dispatch login event
+            // Dispatch login event as login flow has completed at this point
             d("auth");
             d("done");
         }).catch((error) => {
@@ -139,7 +138,7 @@
     {#if ui_errorMessageDisplay}
     <ErrorAlert message={ui_errorMessageDisplay} />
     {/if}
-    <form in:fade on:submit|preventDefault={login}>
+    <form in:fade on:submit|preventDefault>
         <div class="row">
             <div class="three columns">
                 <label for="i_phoneNo">Phone Number</label>
@@ -153,7 +152,7 @@
         <div class="three columns">
             <label for="i_verificationNo" style="margin-top: 0.5em;">Verification Code:</label>
             <input class="u-full-width" type="text" placeholder="123456" id="i_verificationNo" style="margin-bottom: 1em;">
-            <button on:click={confirmCaptchaCallback}>Verify</button>
+            <button class="button" on:click={confirmCaptchaCallback}>Verify</button>
         </div>
     </div>
     {/if}
