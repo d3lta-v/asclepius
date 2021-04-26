@@ -2,4 +2,6 @@
 /public/build/
 /src/firebase_config.ts
 
+.firebaserc
+
 .DS_Store
