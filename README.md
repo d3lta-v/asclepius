@@ -1,16 +1,6 @@
 # Asclepius - a modern serverless temperature taking web app
 
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
-
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
-
-```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
-```
-
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
-
+Temperature taking with Firebase
 
 ## Get started
 
@@ -29,17 +19,39 @@ npm run dev
 
 Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
 
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+## Security Design
 
-If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
+This application has been carefully designed to protect user information to the largest degree with industry good practises.
 
-## Database design and security
+### Database
 
-This application uses Firebase Cloud Firestore. The security of the database is handled entirely in the server as per Firebase's design. Some basic principals applies:
+This application uses Firebase Cloud Firestore. The security of the database is handled entirely in the server as per Firebase's design. Some basic principles applies:
 
-1. Temperature records are r/w by owner + admin ONLY.
-2. Mapping are r/w by admin ONLY.
-3. Database is NOT to be publically read.
+1. Individual users can read/write to their OWN temperature records ONLY.
+2. Superusers can read/write to ALL temperature records.
+3. Superusers can read/write to ALL mappings of name and phone number.
+4. Ultrausers (aka developer account holders) can read/write to ALL parts of the database, including security rules.
+5. Anonymous/Public users have NO access to any part of the database.
+
+### Login
+
+The data is protected behind a robust login and authentication systems through a phone number and OTP combination. Phone numbers are the most anonymised authentication method available with a Firebase backend, to ensure user privacy.
+
+### Data Handling and Collection
+
+The application **only** collects the following information
+
+1. Mobile phone numbers (for user authentication and identification ONLY)
+2. Name (for superusers to map/correspond the phone number to name during collation)
+3. Temperatures corresponding to phone numbers
+
+### Ultrauser handling
+
+Ultrausers **MUST** be protected with 2nd factor authentication to ensure that data breaches do not occur at the Ultrauser level.
+
+### Auditability of Source Code
+
+The source code is publicly auditable on this website, Github. Infosec researchers are welcome to audit this source code.
 
 ## Building and running in production mode
 
@@ -50,14 +62,3 @@ npm run build
 ```
 
 You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
-
-
-## Single-page app mode
-
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
-
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
-
-```js
-"start": "sirv public --single"
-```
