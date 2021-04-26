@@ -28,14 +28,13 @@ This application has been carefully designed to protect user information to the 
 This application uses Firebase Cloud Firestore. The security of the database is handled entirely in the server as per Firebase's design. Some basic principles applies:
 
 1. Individual users can read/write to their OWN temperature records ONLY.
-2. Superusers can read/write to ALL temperature records.
-3. Superusers can read/write to ALL mappings of name and phone number.
-4. Ultrausers (aka developer account holders) can read/write to ALL parts of the database, including security rules.
-5. Anonymous/Public users have NO access to any part of the database.
+2. Superusers can read/write to ALL temperature records and to ALL mappings of name and phone number. This account should be protected to a large degree.
+3. Ultrausers (aka developer account holders) can read/write to ALL parts of the database, including security rules. Hence, it should be protected to the highest degree through compulsory 2FA on the Google Account level.
+4. Anonymous/Public users have NO access to any part of the database.
 
 ### Login
 
-The data is protected behind a robust login and authentication systems through a phone number and OTP combination. Phone numbers are the most anonymised authentication method available with a Firebase backend, to ensure user privacy.
+The data is protected behind a robust login and authentication systems through a phone number and OTP combination, ensuring that all accounts enjoy 2FA levels of security. Phone numbers are the most anonymised authentication method available with a Firebase backend, to ensure user privacy.
 
 ### Data Handling and Collection
 
