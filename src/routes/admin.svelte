@@ -1,10 +1,17 @@
 <script lang="ts">
-    // import Auth from "../components/Auth.svelte";
+    // =======================================================================
+    // Imports
+    import {auth} from "../services/firebase";
+    import {createEventDispatcher} from "svelte";
+
+    // =======================================================================
+    // Variables and constants
     let isAdminUser = true;
     let isAuthenticated = false;
-
-    // Don't forget to add logic that kicks people out if there're not logged in
-    import {auth} from "../services/firebase";
+    const d = createEventDispatcher();
+    
+    // =======================================================================
+    // Lifecycle
 
     // Login check
     auth.onAuthStateChanged(user => {
@@ -14,23 +21,52 @@
             // TODO: validate whether the user is an superuser
         } else {
             console.log("User is null");
-            // TODO: kick the user out
+            window.location.href = "/"; // kick the user out to login page
         }
-    })
+    });
+
+    // =======================================================================
+    // Functions
+
+    function logout() {
+        // ui_errorMessageDisplay = null;
+        console.log("Logging out...")
+        // destroy the captcha instance so that we can recreate it next time
+        // captchaConfirmation = null;
+        // appVerifier.clear();
+        // appVerifier = null;
+        // Actually sign out
+        if (auth.currentUser) {
+            auth.signOut().then(() => {
+                // Sign-out successful.
+                console.log("User signed out");
+                // Dispatch logout event
+                d("logout");
+                d("done");
+                isAuthenticated = false;
+            }).catch((error) => {
+                // An error happened.
+                console.error(error);
+            });
+        }
+    }
+
 </script>
 
 <div class="container">
     <div class="row">
-        <div class="seven columns">
+        <div class="six columns">
             <h5 style="margin-top: 1em; margin-right: 1em; display: inline-block;">Asclepius Temperature Recording Portal</h5>
         </div>
         {#if isAdminUser}
-        <div class="five columns" style="padding-top: 2em;">
-            <a class="button" style="margin-right: 1em;" href="/temp">Take Temperature</a>
-            <a class="button button-primary" href="/admin">Admin Panel</a>
+        <div class="six columns" style="padding-top: 2em;">
+            <a class="button" style="margin-right: 0em;" href="/temp">Take Temperature</a>
+            <a class="button button-primary" style="margin-right: 0em;" href="/admin">Admin Panel</a>
+            <button class="button" on:click={logout}>Log Out</button>
         </div>
         {/if}
     </div>
+    <hr />
     <div class="row">
         <table class="u-full-width">
             <thead>
