@@ -6,7 +6,7 @@
     import firebase from "firebase/app";
     import {auth} from "../services/firebase";
     import {createEventDispatcher} from "svelte";
-    import { onMount } from 'svelte';
+    import { onMount, afterUpdate } from 'svelte';
 
     // =======================================================================
     // Variables and constants
@@ -27,37 +27,48 @@
     onMount(() => {
         console.log("onMount called");
         ui_phoneNumberField = document.getElementById("i_phoneNo") as HTMLInputElement;
-        // Create CAPTCHA
-        // TODO: might need to redo this every time after user logs out due to reCAPTCHA client element has been removed: 0
-        createCaptchaVerifier();
+    });
+
+    afterUpdate(() => {
+        // Create CAPTCHA when afterUpdate is called so that the right captcha gets called
+
+        console.log("afterUpdate called");
+        // check if UI for login exists AND that CAPTCHA verifier is null
+        if (document.getElementById("i_phoneNo") && !appVerifier) {
+            createCaptchaVerifier();
+        }
     });
 
     // This will check when the authentication state changes so that the user gets directed to the right place
     auth.onAuthStateChanged(user => {
         isAuthenticated = !!user;
-        if (user) d("auth");
+        // if (user) d("auth");
     });
 
     // =======================================================================
     // Functions
 
     function createCaptchaVerifier() {
-        appVerifier = new firebase.auth.RecaptchaVerifier('i_login', {
-            'size': 'invisible',
-            'callback': (response) => {
-                console.log("CAPTCHA solved: ", response);
-                // reCAPTCHA solved, initialise the login flow from here
-                login();
-            },
-            'expired-callback': () => {
-                // Response expired. Ask user to solve reCAPTCHA again.
-                // ...
-                ui_errorMessageDisplay = "reCAPTCHA error, please solve reCAPTCHA again";
-            }
-        });
+        if (!appVerifier) {
+            appVerifier = new firebase.auth.RecaptchaVerifier('i_login', {
+                'size': 'invisible',
+                'callback': (response) => {
+                    console.log("CAPTCHA solved: ", response);
+                    // reCAPTCHA solved, initialise the login flow from here
+                    login();
+                },
+                'expired-callback': () => {
+                    // Response expired. Ask user to solve reCAPTCHA again.
+                    // ...
+                    ui_errorMessageDisplay = "reCAPTCHA error, please solve reCAPTCHA again";
+                }
+            });
 
-        // Pre-render CAPTCHA widget
-        appVerifier.render();
+            // Pre-render CAPTCHA widget
+            appVerifier.render();
+        } else {
+            console.log("app verifier is already created, no need to create it a second time");
+        }
     }
 
     function login() {
@@ -103,8 +114,6 @@
             ui_errorMessageDisplay = error;
         });
     }
-
-    // function register() {}
 
     function logout() {
         ui_errorMessageDisplay = null;
