@@ -7,7 +7,7 @@
 
     // =======================================================================
     // Variables and constants
-    let isAdminUser = false;
+    let isAdminUser = true;
     let isAuthenticated = false;
     const d = createEventDispatcher();
 
@@ -51,6 +51,7 @@
             <button class="button topbar-loginBtn" on:click={logout}>Log Out</button>
         </div>
     </div>
+    <hr />
     <div class="row">
         <p>You have not yet submitted your AM temperature yet.</p>
     </div>

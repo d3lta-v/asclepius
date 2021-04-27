@@ -56,15 +56,15 @@
 <div class="container">
     <div class="row">
         <div class="six columns">
-            <h5 style="margin-top: 1em; margin-right: 1em; display: inline-block;">Asclepius Temperature Recording Portal</h5>
+            <h5 style="margin-top: 1em; margin-bottom: 0; display: inline-block;">Asclepius Temperature Recording Portal</h5>
         </div>
-        {#if isAdminUser}
-        <div class="six columns" style="padding-top: 2em;">
+        <div class="six columns topbar">
+            {#if isAdminUser}
             <a class="button" style="margin-right: 0em;" href="/temp">Take Temperature</a>
             <a class="button button-primary" style="margin-right: 0em;" href="/admin">Admin Panel</a>
-            <button class="button" on:click={logout}>Log Out</button>
+            {/if}
+            <button class="button topbar-loginBtn" on:click={logout}>Log Out</button>
         </div>
-        {/if}
     </div>
     <hr />
     <div class="row">
