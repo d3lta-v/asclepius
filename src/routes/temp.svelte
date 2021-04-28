@@ -36,6 +36,7 @@
         isAuthenticated = !!user;
         if (user) {
             // TODO: validate whether the user is an superuser
+            temperatureStatus(); //TODO DELETE THIS LINE
         } else {
             console.log("User is null");
             window.location.href = "/"; // kick the user out to login page
@@ -88,6 +89,32 @@
         }
         db.collection("temperatures").add(record);
     }
+
+    function temperatureStatus() {
+        // This function checks if the user has already sent 
+        // Get the today's date
+        const currentDateStamp = firebase.firestore.Timestamp.now();
+        const currentDateStampDated = currentDateStamp.toDate();
+        const currentHour = currentDateStampDated.getHours();
+        const ampm = currentHour >= 12 ? "pm" : "am";
+
+        // db.collection("temperatures").where("submitted", ">", currentDateStamp).get().then((doc) => {
+        //     if (doc.exists) {
+        //         console.log("Document data:", doc.query);
+        //     } else {
+        //         // doc.data() will be undefined in this case
+        //         console.log("No such document!");
+        //     }
+        // }).catch((error) => {
+        //     console.log("Error getting document:", error);
+        // });
+
+        // if (ampm == "am") {
+        //     // Query for AM temperature
+        // } else if (ampm == "pm") {
+        //     // Query for PM temperature
+        // }
+    }
 </script>
 
 <div class="container">
@@ -106,15 +133,14 @@
     <hr />
     <div class="row">
         <p>You have not yet submitted your AM temperature yet.</p>
+        <button>Submit Again</button>
     </div>
     <div class="row">
-        <form in:fade on:submit|preventDefault>
-            <div class="row">
-                <div class="seven columns">
-                    <label for="i_phoneNo">Submit your temperature below (e.g. 36.6) in degrees Celsius</label>
-                    <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
-                    <input class="button-primary" type="submit" value="Submit Temperature" id="i_login" on:click={submitTemperature}>
-                </div>
+        <form in:fade on:submit|preventDefault={submitTemperature}>
+            <div class="seven columns">
+                <label for="i_phoneNo">Submit your temperature below (e.g. 36.6) in degrees Celsius</label>
+                <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
+                <input class="button-primary" type="submit" value="Submit Temperature" id="i_login">
             </div>
         </form>
     </div>
