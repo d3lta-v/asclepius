@@ -16,4 +16,4 @@ export const phoneAuthProvider = new firebase.auth.PhoneAuthProvider();
 auth.languageCode = 'en';
 
 // Firestore
-export const firestore = firebase.firestore();
+export const db = firebase.firestore();
