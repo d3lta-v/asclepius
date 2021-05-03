@@ -9,7 +9,7 @@ service cloud.firestore {
     }
     
     function getRoles() {
-      return get(/databases/$(database)/documents/roles/$(request.auth.uid)).data
+      return get(/databases/$(database)/documents/roles/$(request.auth.uid)).data;
     }
     
     function hasRole(role) {
@@ -33,12 +33,13 @@ service cloud.firestore {
     }
     
     match /roles/{user} {
-    	// Allow users to read their own roles, but only
+    	// Allow users to create and read their own roles, but only
     	// update it if they have the admin role
       allow get: if request.auth.uid == user || hasRole('admin');
       allow list: if hasRole('admin');
       allow update: if hasRole('admin');
-      allow create, delete: if false;
+      allow create: if !request.resource.data.keys().hasAny(['admin']) && request.auth.uid == user || hasRole('admin');
+    	allow delete: if hasRole('admin');
     }
     
     match /configuration/{config} {
