@@ -36,7 +36,15 @@
         isAuthenticated = !!user;
         if (user) {
             // TODO: validate whether the user is an superuser
-            temperatureStatus(); //TODO DELETE THIS LINE
+            // Once login flow is completed, verify that /roles have at least 1 key, and if not, create it
+            db.collection("roles").doc(user.uid).get()
+            .then((doc) => {
+                if (!doc.exists){
+                    console.log("user roles for this user does not exist, creating default user role")
+                    db.collection("roles").doc(user.uid).set({user: true});
+                }
+            });
+            temperatureStatus(user.uid); //TODO DELETE THIS LINE
         } else {
             console.log("User is null");
             window.location.href = "/"; // kick the user out to login page
@@ -90,24 +98,55 @@
         db.collection("temperatures").add(record);
     }
 
-    function temperatureStatus() {
+    function temperatureStatus(uid: string) {
         // This function checks if the user has already sent 
-        // Get the today's date
-        const currentDateStamp = firebase.firestore.Timestamp.now();
-        const currentDateStampDated = currentDateStamp.toDate();
-        const currentHour = currentDateStampDated.getHours();
-        const ampm = currentHour >= 12 ? "pm" : "am";
+        // Get the today's date by setting the upper and lower bounds to look for (which by default are current time objects)
+        const upperDateBoundary = new Date();
+        const lowerDateBoundary = new Date();
 
-        // db.collection("temperatures").where("submitted", ">", currentDateStamp).get().then((doc) => {
-        //     if (doc.exists) {
-        //         console.log("Document data:", doc.query);
-        //     } else {
-        //         // doc.data() will be undefined in this case
-        //         console.log("No such document!");
-        //     }
-        // }).catch((error) => {
-        //     console.log("Error getting document:", error);
-        // });
+        const currentHour = upperDateBoundary.getHours();
+        const ampm = currentHour >= 12 ? "pm" : "am";
+        const correctTimezone = upperDateBoundary.getTimezoneOffset() === -480; //TODO: add a configuration option for this value
+
+        if (ampm === "am") {
+            upperDateBoundary.setHours(0,0,0,0);
+            lowerDateBoundary.setHours(12,0,0,0);
+        } else {
+            upperDateBoundary.setHours(12,0,0,1);
+            lowerDateBoundary.setHours(23,59,59,0);
+        }
+
+        if (!correctTimezone) {
+            //TODO: tell the user that their phone might be set to the wrong timezone
+            console.log("Wrong timezone! Aborting");
+            return;
+        }
+
+        // Create date range to query
+        console.log("UID: ", uid);
+
+        db.collection("temperatures")
+        .where("author", "==", uid)
+        // .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
+        // .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
+        .get()
+        .then((querySnapshot) => {
+            console.log("Snapshot received: ");
+            if (querySnapshot.empty) {
+                console.log("snapshot is empty");
+                return;
+            }
+            querySnapshot.forEach(doc => {
+                if (doc.exists) {
+                    console.log(doc.id, " => ", doc.data());
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                }
+            });
+        }).catch((error) => {
+            console.log("Error getting document:", error);
+        });
 
         // if (ampm == "am") {
         //     // Query for AM temperature
