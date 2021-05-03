@@ -22,18 +22,18 @@ service cloud.firestore {
     
   	match /temperatures/{temperature} {
     	// Admin can perform ALL operations
-      // Users can get their own temperature records but not others
+      // Users can get and query their own temperature records but not others
       // Any user can create their own record
       // Only the user themselves or the admin can update their own records
       allow get: if resource.data.author == request.auth.uid || hasRole('admin');
-      allow list: if hasRole('admin');
+      allow list: if resource.data.author == request.auth.uid || hasRole('admin');
       allow create: if isSignedIn();
       allow update: if resource.data.author == request.auth.uid || hasRole('admin');
       allow delete: if resource.data.author == request.auth.uid || hasRole('admin');
     }
     
     match /roles/{user} {
-    	// Allow users to create and read their own roles, but only
+    	// Allow users to read their own roles, but only
     	// update it if they have the admin role
       allow get: if request.auth.uid == user || hasRole('admin');
       allow list: if hasRole('admin');

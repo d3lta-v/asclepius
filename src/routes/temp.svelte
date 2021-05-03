@@ -123,12 +123,10 @@
         }
 
         // Create date range to query
-        console.log("UID: ", uid);
-
         db.collection("temperatures")
         .where("author", "==", uid)
-        // .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
-        // .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
+        .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
+        .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
         .get()
         .then((querySnapshot) => {
             console.log("Snapshot received: ");
