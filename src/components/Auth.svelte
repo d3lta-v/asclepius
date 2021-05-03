@@ -21,12 +21,14 @@
     let ui_errorMessageDisplay: string | null = null;
     let ui_phoneNumberField: HTMLInputElement;
     let ui_verificationNumberField: HTMLInputElement;
+    let ui_loginButton: HTMLButtonElement;
 
     // =======================================================================
     // Lifecycle
     onMount(() => {
         console.log("onMount called");
         ui_phoneNumberField = document.getElementById("i_phoneNo") as HTMLInputElement;
+        ui_loginButton = document.getElementById("i_login") as HTMLButtonElement;
     });
 
     afterUpdate(() => {
@@ -42,7 +44,10 @@
     // This will check when the authentication state changes so that the user gets directed to the right place
     auth.onAuthStateChanged(user => {
         isAuthenticated = !!user;
-        // if (user) d("auth");
+        if (user) {
+            d("auth");
+            d("done");
+        }
     });
 
     // =======================================================================
@@ -65,6 +70,8 @@
             });
 
             // Pre-render CAPTCHA widget
+            // need to verify if the element exists
+            // if ()
             appVerifier.render();
         } else {
             console.log("app verifier is already created, no need to create it a second time");
@@ -103,9 +110,6 @@
             const user = result.user;
             console.log("User logged in as ", user);
             isAuthenticated = true;
-            // Dispatch login event as login flow has completed at this point
-            d("auth");
-            d("done");
         }).catch((error) => {
             // User couldn't sign in (bad verification code?)
             // ...
