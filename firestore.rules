@@ -21,13 +21,14 @@ service cloud.firestore {
     // Rule matching
     
   	match /temperatures/{temperature} {
-    	// Admin can perform ALL operations
-      // Users can get and query their own temperature records but not others
-      // Any user can create their own record
-      // Only the user themselves or the admin can update their own records
+    	// GET: only OP and admin can retrieve individual entries
+      // LIST: only OP and admin can query the records, and ordinary users can query their own
+      // CREATE: any users can create for themselves, admins can create for anybody
+      // UPDATE: only OP can update their own, and admins can update for anybody
+      // DELETE: only OP can delete their own records, and admins can delete anyone's record
       allow get: if resource.data.author == request.auth.uid || hasRole('admin');
       allow list: if resource.data.author == request.auth.uid || hasRole('admin');
-      allow create: if isSignedIn();
+      allow create: if request.resource.data.author == request.auth.uid || hasRole('admin');
       allow update: if resource.data.author == request.auth.uid || hasRole('admin');
       allow delete: if resource.data.author == request.auth.uid || hasRole('admin');
     }
@@ -35,6 +36,11 @@ service cloud.firestore {
     match /roles/{user} {
     	// Allow users to read their own roles, but only
     	// update it if they have the admin role
+      // GET: only the OP can retrieve their own roles, but admins can retrieve anyone's roles
+      // LIST: only admins can query the roles
+      // UPDATE: only admins can update user roles
+      // CREATE: everyone can create non-admin roles for themselves, but admins can create any roles for anyone
+      // DELETE: only admins can delete user roles
       allow get: if request.auth.uid == user || hasRole('admin');
       allow list: if hasRole('admin');
       allow update: if hasRole('admin');
@@ -47,6 +53,7 @@ service cloud.firestore {
     	allow read, write: if hasRole('admin');
     }
   	
+    // Deny all, if other conditions fall through
     match /{document=**} {
       allow read, write: if false;
     }
