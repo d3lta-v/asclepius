@@ -4,7 +4,7 @@
     import {auth, db} from "../services/firebase";
     import {fade} from "svelte/transition";
     import {createEventDispatcher} from "svelte";
-    import { onMount } from 'svelte';
+    import { afterUpdate } from 'svelte';
     import firebase from "firebase/app";
 
     // =======================================================================
@@ -27,7 +27,8 @@
 
     // =======================================================================
     // Lifecycle
-    onMount(() => {
+    afterUpdate(() => {
+        console.log("afterupdate called in temp.svelte");
         ui_temperatureField = document.getElementById("i_temperature") as HTMLInputElement;
     });
 
@@ -168,10 +169,10 @@
         </div>
     </div>
     <hr />
-    <div class="row">
+    <!-- <div class="row">
         <p>You have not yet submitted your AM temperature yet.</p>
-        <button>Submit Again</button>
-    </div>
+        <button class="button">Submit Again</button>
+    </div> -->
     <div class="row">
         <form in:fade on:submit|preventDefault={submitTemperature}>
             <div class="seven columns">
