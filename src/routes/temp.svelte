@@ -146,7 +146,6 @@
             if (querySnapshot.empty) {
                 console.log("snapshot is empty");
                 ui_temperatureSubmitted = false;
-                return;
             } else {
                 ui_temperatureSubmitted = true;
             }
