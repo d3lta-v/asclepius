@@ -80,7 +80,6 @@
                 // Dispatch logout event
                 d("logout");
                 d("done");
-                ui_isVerified = false;
             }).catch((error) => {
                 // An error happened.
                 console.error(error);
