@@ -12,6 +12,8 @@
     let isAdminUser = false;
     let isAuthenticated = false;
     let temperatureListenerCreated = false;
+    let temperatureSubmitted = false;
+
     const d = createEventDispatcher();
 
     interface User {
@@ -143,7 +145,10 @@
             console.log("Snapshot listener received: ");
             if (querySnapshot.empty) {
                 console.log("snapshot is empty");
+                temperatureSubmitted = false;
                 return;
+            } else {
+                temperatureSubmitted = true;
             }
             querySnapshot.forEach(doc => {
                 if (doc.exists) {
@@ -175,24 +180,28 @@
     </div>
     <hr class="topbar-hr" />
     {#if !isAuthenticated}
-    <div class="row">
-        <p class="u-full-width" style="margin-top: 1em; text-align: center;">Verifying User...</p>
-        <!--put a spinner here-->
-    </div>
-    {/if}
-    <!-- <div class="row">
-        <p>You have not yet submitted your AM temperature yet.</p>
-        <button class="button">Submit Again</button>
-    </div> -->
-    {#if isAuthenticated}
-    <div class="row">
-        <form in:fade on:submit|preventDefault={submitTemperature}>
-            <div class="seven columns">
-                <label for="i_temperature">Submit your temperature below (e.g. 36.6) in degrees Celsius</label>
-                <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
-                <input class="button-primary" type="submit" value="Submit Temperature" id="i_login">
+        <!--User is not yet authenticated-->
+        <div class="row">
+            <p class="u-full-width" style="margin-top: 1em; text-align: center;">Verifying User...</p>
+            <!--put a spinner here-->
+        </div>
+    {:else}
+        <!--User is authenticated-->
+        {#if temperatureSubmitted}
+            <div class="row">
+                <p class="u-full-width" style="margin-top: 1em; text-align: center;">You have already submitted your temperature. Thank you!</p>
+                <button class="button">Submit Again</button>
             </div>
-        </form>
-    </div>
+        {:else}
+            <div class="row">
+                <form in:fade on:submit|preventDefault={submitTemperature}>
+                    <div class="seven columns">
+                        <label for="i_temperature">Submit your temperature below (e.g. 36.6) in degrees Celsius</label>
+                        <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
+                        <input class="button-primary" type="submit" value="Submit Temperature" id="i_login">
+                    </div>
+                </form>
+            </div>
+        {/if}
     {/if}
 </div>
