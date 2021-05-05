@@ -9,10 +9,11 @@
 
     // =======================================================================
     // Variables and constants
-    let isAdminUser = false;
-    let isAuthenticated = false;
+    let ui_isAdminUser = false;
+    let ui_isVerified = false; // whether the user and temperature records are checked already
+    let ui_temperatureSubmitted = false;
+
     let temperatureListenerCreated = false;
-    let temperatureSubmitted = false;
 
     const d = createEventDispatcher();
 
@@ -37,7 +38,6 @@
 
     // Login check
     auth.onAuthStateChanged(user => {
-        isAuthenticated = !!user;
         if (user) {
             // TODO: validate whether the user is an superuser
             // Once login flow is completed, verify that /roles have at least 1 key, and if not, create it
@@ -50,9 +50,9 @@
                     console.log("User roles: ", doc.data());
                     // Check if user is admin
                     if (doc.data().admin == true) {
-                        isAdminUser = true;
+                        ui_isAdminUser = true;
                     } else {
-                        isAdminUser = false;
+                        ui_isAdminUser = false;
                     }
                 }
             });
@@ -80,7 +80,7 @@
                 // Dispatch logout event
                 d("logout");
                 d("done");
-                isAuthenticated = false;
+                ui_isVerified = false;
             }).catch((error) => {
                 // An error happened.
                 console.error(error);
@@ -145,10 +145,10 @@
             console.log("Snapshot listener received: ");
             if (querySnapshot.empty) {
                 console.log("snapshot is empty");
-                temperatureSubmitted = false;
+                ui_temperatureSubmitted = false;
                 return;
             } else {
-                temperatureSubmitted = true;
+                ui_temperatureSubmitted = true;
             }
             querySnapshot.forEach(doc => {
                 if (doc.exists) {
@@ -158,6 +158,7 @@
                     console.log("No such document!");
                 }
             });
+            ui_isVerified = true;
         }, (error) => {
             // TODO: show errors to user
             console.error("Temperature query listener errored out: ", error);
@@ -171,15 +172,15 @@
             <h5 style="margin-top: 1em; margin-bottom: 0; display: inline-block;">Asclepius Temperature Recording Portal</h5>
         </div>
         <div class="six columns topbar">
-            {#if isAdminUser}
-            <a class="button button-primary" style="margin-right: 0em;" href="/temp">Take Temperature</a>
-            <a class="button" style="margin-right: 0em;" href="/admin">Admin Panel</a>
+            {#if ui_isAdminUser}
+                <a class="button button-primary" style="margin-right: 0em;" href="/temp">Take Temperature</a>
+                <a class="button" style="margin-right: 0em;" href="/admin">Admin Panel</a>
             {/if}
             <button class="button topbar-loginBtn" on:click={logout}>Log Out</button>
         </div>
     </div>
     <hr class="topbar-hr" />
-    {#if !isAuthenticated}
+    {#if !ui_isVerified}
         <!--User is not yet authenticated-->
         <div class="row">
             <p class="u-full-width" style="margin-top: 1em; text-align: center;">Verifying User...</p>
@@ -187,7 +188,7 @@
         </div>
     {:else}
         <!--User is authenticated-->
-        {#if temperatureSubmitted}
+        {#if ui_temperatureSubmitted}
             <div class="row">
                 <p class="u-full-width" style="margin-top: 1em; text-align: center;">You have already submitted your temperature. Thank you!</p>
                 <button class="button">Submit Again</button>
