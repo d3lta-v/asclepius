@@ -43,6 +43,11 @@
     float: right;
 }
 
+.topbar-hr {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 @media (min-width: 550px) {
     .topbar {
         margin-top: 2em;
@@ -50,5 +55,10 @@
 
     .topbar-loginBtn {
         float: none;
+    }
+
+    .topbar-hr {
+        margin-top: 3rem;
+        margin-bottom: 3.5rem;
     }
 }

@@ -176,7 +176,7 @@
             <button class="button topbar-loginBtn" on:click={logout}>Log Out</button>
         </div>
     </div>
-    <hr />
+    <hr class="topbar-hr" />
     {#if !isAuthenticated}
     <div class="row">
         <p>Verifying User...</p>
