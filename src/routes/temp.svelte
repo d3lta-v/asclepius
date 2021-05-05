@@ -11,6 +11,7 @@
     // Variables and constants
     let isAdminUser = false;
     let isAuthenticated = false;
+    let temperatureListenerCreated = false;
     const d = createEventDispatcher();
 
     interface User {
@@ -53,7 +54,10 @@
                     }
                 }
             });
-            temperatureStatus(user.uid); //TODO DELETE THIS LINE
+            if (!temperatureListenerCreated) {
+                temperatureStatus(user.uid);
+                temperatureListenerCreated = true;
+            }
         } else {
             console.log("User is null");
             window.location.href = "/"; // kick the user out to login page
@@ -108,7 +112,7 @@
     }
 
     function temperatureStatus(uid: string) {
-        // This function checks if the user has already sent 
+        // This function checks if the user has already sent using a query listener
         // Get the today's date by setting the upper and lower bounds to look for (which by default are current time objects)
         const upperDateBoundary = new Date();
         const lowerDateBoundary = new Date();
@@ -126,8 +130,7 @@
         }
 
         if (!correctTimezone) {
-            //TODO: tell the user that their phone might be set to the wrong timezone
-            console.log("Wrong timezone! Aborting");
+            window.alert("Your phone seems to be running on the wrong time zone. Please correct your phone's timezone to UTC+8 (Singapore) before submitting your temperature");
             return;
         }
 
@@ -136,9 +139,8 @@
         .where("author", "==", uid)
         .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
         .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
-        .get()
-        .then((querySnapshot) => {
-            console.log("Snapshot received: ");
+        .onSnapshot((querySnapshot) => {
+            console.log("Snapshot listener received: ");
             if (querySnapshot.empty) {
                 console.log("snapshot is empty");
                 return;
@@ -151,15 +153,10 @@
                     console.log("No such document!");
                 }
             });
-        }).catch((error) => {
-            console.log("Error getting document:", error);
+        }, (error) => {
+            // TODO: show errors to user
+            console.error("Temperature query listener errored out: ", error);
         });
-
-        // if (ampm == "am") {
-        //     // Query for AM temperature
-        // } else if (ampm == "pm") {
-        //     // Query for PM temperature
-        // }
     }
 </script>
 
@@ -179,7 +176,7 @@
     <hr class="topbar-hr" />
     {#if !isAuthenticated}
     <div class="row">
-        <p>Verifying User...</p>
+        <p class="u-full-width" style="margin-top: 1em; text-align: center;">Verifying User...</p>
         <!--put a spinner here-->
     </div>
     {/if}
