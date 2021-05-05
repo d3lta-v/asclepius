@@ -1,15 +1,15 @@
 <script lang="ts">
     // =======================================================================
     // Imports
-    import {auth, db} from "../services/firebase";
-    import {fade} from "svelte/transition";
-    import {createEventDispatcher} from "svelte";
+    import { auth, db } from "../services/firebase";
+    import { fade } from "svelte/transition";
+    import { createEventDispatcher } from "svelte";
     import { afterUpdate } from 'svelte';
     import firebase from "firebase/app";
 
     // =======================================================================
     // Variables and constants
-    let isAdminUser = true;
+    let isAdminUser = false;
     let isAuthenticated = false;
     const d = createEventDispatcher();
 
@@ -43,6 +43,14 @@
                 if (!doc.exists){
                     console.log("user roles for this user does not exist, creating default user role")
                     db.collection("roles").doc(user.uid).set({user: true});
+                } else {
+                    console.log("User roles: ", doc.data());
+                    // Check if user is admin
+                    if (doc.data().admin == true) {
+                        isAdminUser = true;
+                    } else {
+                        isAdminUser = false;
+                    }
                 }
             });
             temperatureStatus(user.uid); //TODO DELETE THIS LINE
@@ -169,17 +177,25 @@
         </div>
     </div>
     <hr />
+    {#if !isAuthenticated}
+    <div class="row">
+        <p>Verifying User...</p>
+        <!--put a spinner here-->
+    </div>
+    {/if}
     <!-- <div class="row">
         <p>You have not yet submitted your AM temperature yet.</p>
         <button class="button">Submit Again</button>
     </div> -->
+    {#if isAuthenticated}
     <div class="row">
         <form in:fade on:submit|preventDefault={submitTemperature}>
             <div class="seven columns">
-                <label for="i_phoneNo">Submit your temperature below (e.g. 36.6) in degrees Celsius</label>
+                <label for="i_temperature">Submit your temperature below (e.g. 36.6) in degrees Celsius</label>
                 <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
                 <input class="button-primary" type="submit" value="Submit Temperature" id="i_login">
             </div>
         </form>
     </div>
+    {/if}
 </div>
