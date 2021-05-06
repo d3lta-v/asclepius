@@ -180,22 +180,23 @@
     <hr class="topbar-hr" />
     {#if !ui_isVerified}
         <!--User is not yet authenticated-->
-        <div class="row">
+        <div in:fade class="row">
             <p class="u-full-width" style="margin-top: 1em; text-align: center;">Verifying User...</p>
             <!--put a spinner here-->
         </div>
     {:else}
         <!--User is authenticated-->
         {#if ui_temperatureSubmitted}
-            <div class="row">
+            <div in:fade class="row">
                 <p class="u-full-width" style="margin-top: 1em; text-align: center;">You have already submitted your temperature. Thank you!</p>
-                <button class="button">Submit Again</button>
+                <button class="button" on:click={() => ui_temperatureSubmitted = false}>Submit Again</button>
             </div>
         {:else}
-            <div class="row">
-                <form in:fade on:submit|preventDefault={submitTemperature}>
-                    <div class="seven columns">
-                        <label for="i_temperature">Submit your temperature below (e.g. 36.6) in degrees Celsius</label>
+            <div in:fade class="row">
+                <form on:submit|preventDefault={submitTemperature}>
+                    <div class="six columns">
+                        <label for="i_temperature">Temperature in deg. Celsius (e.g. 36.6)</label>
+                        <p style="margin-bottom: 1rem">Please submit your temperature after you have taken it with a personal thermometer</p>
                         <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
                         <input class="button-primary" type="submit" value="Submit Temperature" id="i_login">
                     </div>
