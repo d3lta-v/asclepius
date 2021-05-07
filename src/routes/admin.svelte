@@ -3,6 +3,7 @@
     // Imports
     import {auth} from "../services/firebase";
     import {createEventDispatcher} from "svelte";
+    import InfoRow from "../components/InfoRow.svelte"
 
     // =======================================================================
     // Variables and constants
@@ -80,42 +81,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="centred-td">1</td>
-                    <td>91478066</td>
-                    <td>Pan Ziyue</td>
-                    <td>36.5</td>
-                    <td>36.6</td>
-                    <td>
-                        <button class="compactBtn">Edit</button>
-                        <button class="compactBtn">⬆️</button>
-                        <button class="compactBtn">⬇️</button>
-                        <button class="compactBtn">🗑️</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="centred-td">2</td>
-                    <td><input type="tel" placeholder="91234567" value="70000000"></td>
-                    <td><input type="text" placeholder="Name" value="John Smith"></td>
-                    <td><input class="number-field" type="number" placeholder="AM Temp" value="36.5" step="0.1" max="45" min="30"></td>
-                    <td><input class="number-field" type="number" placeholder="PM Temp" value="36.5" step="0.1" max="45" min="30"></td>
-                    <td>
-                        <button class="compactBtn">Done</button>
-                        <button class="compactBtn">⬆️</button>
-                        <button class="compactBtn">⬇️</button>
-                        <button class="compactBtn">🗑️</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="centred-td">N/A</td>
-                    <td><input type="tel" placeholder="91234567"></td>
-                    <td><input type="text" placeholder="New Name Here"></td>
-                    <td>N/A</td>
-                    <td>N/A</td>
-                    <td>
-                        <button class="compactBtn">Add</button>
-                    </td>
-                </tr>
+                <InfoRow></InfoRow>
             </tbody>
           </table>
     </div>
