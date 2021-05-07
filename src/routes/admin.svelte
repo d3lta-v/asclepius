@@ -10,6 +10,16 @@
     let isAdminUser = true;
     let isAuthenticated = false;
     const d = createEventDispatcher();
+
+    interface TemperatureRow {
+        serialNo: number,
+        phoneNo: string,
+        authorName: string, // Name of author, based on phone number matching
+        amTemperature: number,
+        pmTemperature: number
+    };
+
+    let temperatureRecords: TemperatureRow[] = [];
     
     // =======================================================================
     // Lifecycle
@@ -81,7 +91,20 @@
                 </tr>
             </thead>
             <tbody>
-                <InfoRow></InfoRow>
+                {#if temperatureRecords.length > 0}
+                    {#each temperatureRecords as temp}
+                        <InfoRow></InfoRow>
+                    {/each}
+                {:else}
+                    <tr>
+                        <td class="centred-td"></td>
+                        <td></td>
+                        <td>No Data</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {/if}
             </tbody>
           </table>
     </div>

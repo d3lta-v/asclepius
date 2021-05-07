@@ -1,20 +1,11 @@
 <script lang="ts">
     // export let message: string;
-    interface TemperatureRow {
-        serialNo: number,
-        phoneNo: string,
-        authorName: string, // Name of author, based on phone number matching
-        amTemperature: number,
-        pmTemperature: number
-    }
 
-    let row: TemperatureRow = {
-        serialNo: 1,
-        phoneNo: "91234567",
-        authorName: "Testing",
-        amTemperature: 36.6,
-        pmTemperature: 36.5
-    }
+    let serialNo = 1;
+    let phoneNo = "91234567";
+    let authorName = "Testing";
+    let amTemperature = 36.6;
+    let pmTemperature = 36.5;
 
     let editing = false; // true means that the row is under editing mode
     let newRow = false;
@@ -40,8 +31,8 @@
     {#if newRow}
         <!--New Row-->
         <td class="centred-td">N/A</td>
-        <td><input type="tel" placeholder="91234567" bind:value={row.phoneNo}></td>
-        <td><input type="text" placeholder="New Name Here" bind:value={row.authorName}></td>
+        <td><input type="tel" placeholder="91234567" bind:value={phoneNo}></td>
+        <td><input type="text" placeholder="New Name Here" bind:value={authorName}></td>
         <td>N/A</td>
         <td>N/A</td>
         <td>
@@ -50,11 +41,11 @@
     {:else}
         <!--Data already exists-->
         {#if editing}
-            <td class="centred-td">{row.serialNo}</td>
-            <td><input type="tel" placeholder="91234567" bind:value={row.phoneNo}></td>
-            <td><input type="text" placeholder="Name" bind:value={row.authorName}></td>
-            <td><input class="number-field" type="number" placeholder="AM Temp" bind:value={row.amTemperature} step="0.1" max="45" min="30"></td>
-            <td><input class="number-field" type="number" placeholder="PM Temp" bind:value={row.pmTemperature} step="0.1" max="45" min="30"></td>
+            <td class="centred-td">{serialNo}</td>
+            <td><input type="tel" placeholder="91234567" bind:value={phoneNo}></td>
+            <td><input type="text" placeholder="Name" bind:value={authorName}></td>
+            <td><input class="number-field" type="number" placeholder="AM Temp" bind:value={amTemperature} step="0.1" max="45" min="30"></td>
+            <td><input class="number-field" type="number" placeholder="PM Temp" bind:value={pmTemperature} step="0.1" max="45" min="30"></td>
             <td>
                 <button class="compactBtn" on:click={() => editing = false}>Done</button>
                 <button class="compactBtn" on:click={shiftUp}>⬆️</button>
@@ -62,11 +53,11 @@
                 <button class="compactBtn" on:click={delet}>🗑️</button>
             </td>
         {:else}
-            <td class="centred-td">{row.serialNo}</td>
-            <td>{row.phoneNo}</td>
-            <td>{row.authorName}</td>
-            <td>{row.amTemperature}</td>
-            <td>{row.pmTemperature}</td>
+            <td class="centred-td">{serialNo}</td>
+            <td>{phoneNo}</td>
+            <td>{authorName}</td>
+            <td>{amTemperature}</td>
+            <td>{pmTemperature}</td>
             <td>
                 <button class="compactBtn" on:click={() => editing = true}>Edit</button>
                 <button class="compactBtn" on:click={shiftUp}>⬆️</button>
