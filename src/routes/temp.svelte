@@ -4,18 +4,23 @@
     import { auth, db } from "../services/firebase";
     import { fade } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
-    import { afterUpdate } from 'svelte';
+    import { afterUpdate, onDestroy } from 'svelte';
     import firebase from "firebase/app";
 
     // =======================================================================
     // Variables and constants
+
+    // UI elements
     let ui_isAdminUser = false;
     let ui_isVerified = false; // whether the user and temperature records are checked already
     let ui_temperatureSubmitted = false;
 
+    // Variables
     let temperatureListenerCreated = false;
-
     const d = createEventDispatcher();
+
+    // Listener handles
+    let unsubTemperatureListener: () => any;
 
     interface User {
         phoneNumber: string, author: string
@@ -35,6 +40,8 @@
         console.log("afterupdate called in temp.svelte");
         ui_temperatureField = document.getElementById("i_temperature") as HTMLInputElement;
     });
+
+    onDestroy(unsubTemperatureListener);
 
     // Login check
     auth.onAuthStateChanged(user => {
@@ -136,7 +143,7 @@
         }
 
         // Create date range to query
-        db.collection("temperatures")
+        unsubTemperatureListener = db.collection("temperatures")
         .where("author", "==", uid)
         .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
         .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
