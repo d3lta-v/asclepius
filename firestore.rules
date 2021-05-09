@@ -52,7 +52,12 @@ service cloud.firestore {
     	// The configuration table can only be accessed by admins
     	allow read, write: if hasRole('admin');
     }
-  	
+
+    match /namemap/{mapping} {
+      // The namemap table can only be accessed by admins
+    	allow read, write: if hasRole('admin');
+    }
+
     // Deny all, if other conditions fall through
     match /{document=**} {
       allow read, write: if false;
