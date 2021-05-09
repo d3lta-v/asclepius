@@ -21,7 +21,7 @@
             console.log("Document successfully shifted up");
         }).catch((error) => {
             console.error("Error shifting document: ", error);
-        });;
+        });
     }
 
     function shiftDown() {
@@ -31,7 +31,7 @@
             console.log("Document successfully shifted down");
         }).catch((error) => {
             console.error("Error shifting document: ", error);
-        });;
+        });
     }
 
     function add() {
@@ -57,6 +57,18 @@
             console.error("Error removing document: ", error);
         });
     }
+
+    function editDone() {
+        editing = false;
+        db.collection("namemap").doc(id).update({ 
+            phoneNo,
+            authorName
+        }).then(() => {
+            console.log("Document successfully edited");
+        }).catch((error) => {
+            console.error("Error editing document: ", error);
+        });
+    }
 </script>
 
 <tr in:fade>
@@ -79,7 +91,7 @@
             <td><input class="number-field" type="number" placeholder="AM Temp" bind:value={amTemperature} step="0.1" max="45" min="30"></td>
             <td><input class="number-field" type="number" placeholder="PM Temp" bind:value={pmTemperature} step="0.1" max="45" min="30"></td>
             <td>
-                <button class="compactBtn" on:click={() => editing = false}>Done</button>
+                <button class="compactBtn" on:click={editDone}>Done</button>
                 <button class="compactBtn" on:click={shiftUp}>⬆️</button>
                 <button class="compactBtn" on:click={shiftDown}>⬇️</button>
                 <button class="compactBtn" on:click={delet}>🗑️</button>

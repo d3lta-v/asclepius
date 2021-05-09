@@ -121,6 +121,18 @@
             // Sort by serial number
             temperatureRecords.sort(function(a, b){return a.serialNo-b.serialNo});
         });
+        // Add the New row for users to add phone numbers
+        temperatureRecords.push({
+            phoneNo: "",
+            serialNo: temperatureRecords.length+1,
+            authorName: "",
+            amTemperature: null,
+            pmTemperature: null,
+            editing: false,
+            newRow: true,
+            id: null
+        });
+        temperatureRecords = temperatureRecords;
     }
 
     function logout() {
