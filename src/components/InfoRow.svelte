@@ -1,8 +1,9 @@
 <script lang="ts">
     // export let message: string;
-    import { afterUpdate } from 'svelte';
-    import { auth, db } from "../services/firebase";
+    import { onDestroy, beforeUpdate, afterUpdate } from 'svelte';
+    import { db } from "../services/firebase";
     import { fade } from "svelte/transition";
+    import firebase from "firebase/app";
 
     export let serialNo = 0;
     export let phoneNo = "";
@@ -13,6 +14,69 @@
 
     export let editing = false; // true means that the row is under editing mode
     export let newRow = false;
+
+    let amListener: () => any | null;
+
+    beforeUpdate(() => {
+        console.log("before update inforow with s/n ", serialNo, ", id: ", id);
+        if (amListener) {
+            console.log("Destroying AM listener...");
+            amListener();
+        } else {
+            console.log("AM listener is null");
+        }
+    });
+
+    afterUpdate(() => {
+        // NOTE TODO: THIS IS NOT WORKING
+        console.log("after update inforow with s/n ", serialNo, ", id: ", id);
+        // Insert listeners at this point
+        const upperDateBoundary = new Date();
+        const lowerDateBoundary = new Date();
+
+        // upperDateBoundary.setHours(0,0,0,0);
+        // lowerDateBoundary.setHours(12,0,0,0);
+
+        upperDateBoundary.setHours(12,0,0,1);
+        lowerDateBoundary.setHours(23,59,59,0);
+
+        // Destroy listener if it exists
+        if (amListener) {
+            amListener();
+        }
+
+        console.log("Phone number: ", phoneNo);
+        amListener = db.collection("temperatures")
+        .where("phoneNo", "==", phoneNo)
+        .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
+        .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
+        .onSnapshot((querySnapshot) => {
+            console.log("Snapshot listener received: ");
+            if (querySnapshot.empty) {
+                console.log("snapshot is empty");
+            }
+            querySnapshot.forEach(doc => {
+                if (doc.exists) {
+                    console.log(doc.id, " => ", doc.data());
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                }
+            });
+        }, (error) => {
+            // TODO: show errors to user
+            console.error("Temperature query listener errored out: ", error);
+        });
+
+        // TODO: pm listener here
+    });
+
+    onDestroy(() => {
+        // destroy all listeners
+        if (amListener) {
+            amListener();
+        }
+    });
 
     function shiftUp() {
         // This function will shift the row upwards
