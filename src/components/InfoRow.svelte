@@ -16,10 +16,22 @@
 
     function shiftUp() {
         // This function will shift the row upwards
+        serialNo--;
+        db.collection("namemap").doc(id).update({ serialNo }).then(() => {
+            console.log("Document successfully shifted up");
+        }).catch((error) => {
+            console.error("Error shifting document: ", error);
+        });;
     }
 
     function shiftDown() {
         // This function will shift the row downwards
+        serialNo++;
+        db.collection("namemap").doc(id).update({ serialNo }).then(() => {
+            console.log("Document successfully shifted down");
+        }).catch((error) => {
+            console.error("Error shifting document: ", error);
+        });;
     }
 
     function add() {

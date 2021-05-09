@@ -85,6 +85,7 @@
                 }
                 if (change.type === "modified") {
                     const data = change.doc.data();
+                    console.log("Modified record with id ", change.doc.id, " and data: ", data);
                     const index = temperatureRecords.map(e => e.id).indexOf(change.doc.id);
                     temperatureRecords[index] = {
                         phoneNo: data.phoneNo,
@@ -116,6 +117,9 @@
                 newRow: true,
                 id: null
             });
+
+            // Sort by serial number
+            temperatureRecords.sort(function(a, b){return a.serialNo-b.serialNo});
         });
     }
 
