@@ -41,12 +41,11 @@
         ui_temperatureField = document.getElementById("i_temperature") as HTMLInputElement;
     });
 
-    onDestroy(unsubTemperatureListener);
+    // onDestroy(unsubTemperatureListener);
 
     // Login check
     auth.onAuthStateChanged(user => {
         if (user) {
-            // TODO: validate whether the user is an superuser
             // Once login flow is completed, verify that /roles have at least 1 key, and if not, create it
             db.collection("roles").doc(user.uid).get()
             .then((doc) => {
