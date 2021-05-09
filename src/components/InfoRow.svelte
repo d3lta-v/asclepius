@@ -1,14 +1,18 @@
 <script lang="ts">
     // export let message: string;
+    import { afterUpdate } from 'svelte';
+    import { auth, db } from "../services/firebase";
+    import { fade } from "svelte/transition";
 
-    let serialNo = 1;
-    let phoneNo = "91234567";
-    let authorName = "Testing";
-    let amTemperature = 36.6;
-    let pmTemperature = 36.5;
+    export let serialNo = 0;
+    export let phoneNo = "";
+    export let authorName = "";
+    export let amTemperature = 0;
+    export let pmTemperature = 0;
+    export let id = "";
 
-    let editing = false; // true means that the row is under editing mode
-    let newRow = false;
+    export let editing = false; // true means that the row is under editing mode
+    export let newRow = false;
 
     function shiftUp() {
         // This function will shift the row upwards
@@ -19,19 +23,35 @@
     }
 
     function add() {
-        // This function adds the row to the rest
+        // This function adds the row to the mapping
+        let obj = {
+            authorName,
+            phoneNo,
+            serialNo
+        };
+        db.collection("namemap").add(obj).then(() => {
+            console.log("Document successfully added");
+        }).catch((error) => {
+            console.error("Error adding document: ", error);
+        });
+        // Complete the add process
     }
 
     function delet() {
         // This function will delete the row
+        db.collection("namemap").doc(id).delete().then(() => {
+            console.log("Document successfully deleted");
+        }).catch((error) => {
+            console.error("Error removing document: ", error);
+        });
     }
 </script>
 
-<tr>
+<tr in:fade>
     {#if newRow}
         <!--New Row-->
-        <td class="centred-td">N/A</td>
-        <td><input type="tel" placeholder="91234567" bind:value={phoneNo}></td>
+        <td class="centred-td">{serialNo}</td>
+        <td><input type="tel" placeholder="+6591234567" bind:value={phoneNo}></td>
         <td><input type="text" placeholder="New Name Here" bind:value={authorName}></td>
         <td>N/A</td>
         <td>N/A</td>
@@ -42,7 +62,7 @@
         <!--Data already exists-->
         {#if editing}
             <td class="centred-td">{serialNo}</td>
-            <td><input type="tel" placeholder="91234567" bind:value={phoneNo}></td>
+            <td><input type="tel" placeholder="+6591234567" bind:value={phoneNo}></td>
             <td><input type="text" placeholder="Name" bind:value={authorName}></td>
             <td><input class="number-field" type="number" placeholder="AM Temp" bind:value={amTemperature} step="0.1" max="45" min="30"></td>
             <td><input class="number-field" type="number" placeholder="PM Temp" bind:value={pmTemperature} step="0.1" max="45" min="30"></td>
