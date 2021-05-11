@@ -53,7 +53,6 @@
                     console.log("user roles for this user does not exist, creating default user role")
                     db.collection("roles").doc(user.uid).set({user: true});
                 } else {
-                    console.log("User roles: ", doc.data());
                     // Check if user is admin
                     if (doc.data().admin == true) {
                         ui_isAdminUser = true;
