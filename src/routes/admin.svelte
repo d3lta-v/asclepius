@@ -96,7 +96,7 @@
                     const lowerDateBoundary = new Date();
 
                     upperDateBoundary.setHours(0,0,0,0);
-                    lowerDateBoundary.setHours(12,0,0,0);
+                    lowerDateBoundary.setHours(24,59,59,0);
 
                     temperatureListeners.push({
                         id: change.doc.id,
@@ -115,7 +115,12 @@
                                     console.log(doc.id, " => ", doc.data());
                                     // Automatically change the temperature by finding it first
                                     const phoneNumberMatching = (element: TemperatureRow) => element.phoneNumber === doc.data().phoneNumber;
-                                    temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = doc.data().temperature;
+                                    const timestamp: firebase.firestore.Timestamp = doc.data().submitted;
+                                    if (isPM(timestamp)) {
+                                        temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].pmTemperature = doc.data().temperature;
+                                    } else {
+                                        temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = doc.data().temperature;
+                                    }
                                 } else {
                                     // doc.data() will be undefined in this case
                                     console.log("No such document!");
@@ -144,11 +149,11 @@
                 }
                 if (change.type === "removed") {
                     console.log("Removed record: ", change.doc.data());
-                    const index = temperatureRows.map(e => e.id).indexOf(change.doc.id);
-                    const index2 = temperatureListeners.map(e => e.id).indexOf(change.doc.id);
-                    temperatureListeners[index2].listener(); // destroy the listener
-                    temperatureListeners.splice(index2, index2);
-                    temperatureRows.splice(index,index);
+                    const indexRow = temperatureRows.map(e => e.id).indexOf(change.doc.id);
+                    const indexListener = temperatureListeners.map(e => e.id).indexOf(change.doc.id);
+                    temperatureListeners[indexListener].listener(); // destroy the listener
+                    temperatureListeners.splice(indexListener, indexListener);
+                    temperatureRows.splice(indexRow,indexRow);
 
                     // There's a bug concerning the removal of the last element in the array
                 }
@@ -201,6 +206,12 @@
                 console.error(error);
             });
         }
+    }
+
+    function isPM(timestamp: firebase.firestore.Timestamp) {
+        const timeAsDate = timestamp.toDate();
+        //TODO: does this properly take into account timezones?
+        return timeAsDate.getHours() >= 12;
     }
 
 </script>
