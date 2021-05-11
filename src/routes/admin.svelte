@@ -4,6 +4,7 @@
     import {auth, db} from "../services/firebase";
     import {createEventDispatcher} from "svelte";
     import InfoRow from "../components/InfoRow.svelte"
+    import firebase from "firebase/app";
 
     // =======================================================================
     // Variables and constants
@@ -15,7 +16,7 @@
 
     interface TemperatureRow { // This interface describes the structure of a row of data
         serialNo: number,
-        phoneNo: string,
+        phoneNumber: string,
         authorName: string, // Name of author, based on phone number matching
         amTemperature: number | null,
         pmTemperature: number | null,
@@ -24,7 +25,14 @@
         id: string | null
     };
 
-    let temperatureRecords: TemperatureRow[] = [];
+    interface TemperatureListener {
+        id: string,
+        phoneNumber: string,
+        listener: () => any
+    }
+
+    let temperatureRows: TemperatureRow[] = [];
+    let temperatureListeners: TemperatureListener[] = [];
     
     // =======================================================================
     // Lifecycle
@@ -62,8 +70,8 @@
     function createAdminListener() {
         unsubAdminListener = db.collection("namemap").orderBy("serialNo").onSnapshot((snapshot) => {
             // Pop the last "new row" element
-            if (temperatureRecords.length > 0) {
-                temperatureRecords.pop();
+            if (temperatureRows.length > 0) {
+                temperatureRows.pop();
             }
 
             // Perform changes in the data model
@@ -72,8 +80,8 @@
                 if (change.type === "added") {
                     const data = change.doc.data();
                     console.log("Added record with id ", change.doc.id, " and data: ", data);
-                    temperatureRecords.push({
-                        phoneNo: data.phoneNo,
+                    temperatureRows.push({
+                        phoneNumber: data.phoneNumber,
                         serialNo: data.serialNo,
                         authorName: data.authorName,
                         amTemperature: null,
@@ -82,13 +90,49 @@
                         newRow: false,
                         id: change.doc.id
                     });
+
+                    // add listener
+                    const upperDateBoundary = new Date();
+                    const lowerDateBoundary = new Date();
+
+                    upperDateBoundary.setHours(0,0,0,0);
+                    lowerDateBoundary.setHours(12,0,0,0);
+
+                    temperatureListeners.push({
+                        id: change.doc.id,
+                        phoneNumber: data.phoneNumber,
+                        listener: db.collection("temperatures")
+                        .where("phoneNumber", "==", data.phoneNumber)
+                        .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
+                        .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
+                        .onSnapshot((querySnapshot) => {
+                            console.log("Snapshot listener created for phoneNumber: ", data.phoneNumber);
+                            if (querySnapshot.empty) {
+                                console.log("snapshot is empty");
+                            }
+                            querySnapshot.forEach(doc => {
+                                if (doc.exists) {
+                                    console.log(doc.id, " => ", doc.data());
+                                    // Automatically change the temperature by finding it first
+                                    const phoneNumberMatching = (element: TemperatureRow) => element.phoneNumber === doc.data().phoneNumber;
+                                    temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = doc.data().temperature;
+                                } else {
+                                    // doc.data() will be undefined in this case
+                                    console.log("No such document!");
+                                }
+                            });
+                        }, (error) => {
+                            // TODO: show errors to user
+                            console.error("Temperature query listener errored out: ", error);
+                        })
+                    });
                 }
                 if (change.type === "modified") {
                     const data = change.doc.data();
                     console.log("Modified record with id ", change.doc.id, " and data: ", data);
-                    const index = temperatureRecords.map(e => e.id).indexOf(change.doc.id);
-                    temperatureRecords[index] = {
-                        phoneNo: data.phoneNo,
+                    const index = temperatureRows.map(e => e.id).indexOf(change.doc.id);
+                    temperatureRows[index] = {
+                        phoneNumber: data.phoneNumber,
                         serialNo: data.serialNo,
                         authorName: data.authorName,
                         amTemperature: null,
@@ -100,16 +144,21 @@
                 }
                 if (change.type === "removed") {
                     console.log("Removed record: ", change.doc.data());
-                    const index = temperatureRecords.map(e => e.id).indexOf(change.doc.id);
-                    temperatureRecords.splice(index,index);
+                    const index = temperatureRows.map(e => e.id).indexOf(change.doc.id);
+                    const index2 = temperatureListeners.map(e => e.id).indexOf(change.doc.id);
+                    temperatureListeners[index2].listener(); // destroy the listener
+                    temperatureListeners.splice(index2, index2);
+                    temperatureRows.splice(index,index);
+
+                    // There's a bug concerning the removal of the last element in the array
                 }
-                temperatureRecords = temperatureRecords;
+                temperatureRows = temperatureRows;
             });
 
             // Add the New row for users to add phone numbers
-            temperatureRecords.push({
-                phoneNo: "",
-                serialNo: temperatureRecords.length+1,
+            temperatureRows.push({
+                phoneNumber: "",
+                serialNo: temperatureRows.length+1,
                 authorName: "",
                 amTemperature: null,
                 pmTemperature: null,
@@ -119,12 +168,12 @@
             });
 
             // Sort by serial number
-            temperatureRecords.sort(function(a, b){return a.serialNo-b.serialNo});
+            temperatureRows.sort(function(a, b){return a.serialNo-b.serialNo});
         });
         // Add the New row for users to add phone numbers
-        temperatureRecords.push({
-            phoneNo: "",
-            serialNo: temperatureRecords.length+1,
+        temperatureRows.push({
+            phoneNumber: "",
+            serialNo: temperatureRows.length+1,
             authorName: "",
             amTemperature: null,
             pmTemperature: null,
@@ -132,7 +181,7 @@
             newRow: true,
             id: null
         });
-        temperatureRecords = temperatureRecords;
+        temperatureRows = temperatureRows;
     }
 
     function logout() {
@@ -183,8 +232,8 @@
                 </tr>
             </thead>
             <tbody>
-                {#if temperatureRecords.length > 0}
-                    {#each temperatureRecords as temp}
+                {#if temperatureRows.length > 0}
+                    {#each temperatureRows as temp}
                         <InfoRow {...temp}></InfoRow>
                     {/each}
                 {:else}
