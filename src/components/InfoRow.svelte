@@ -7,7 +7,9 @@
     export let phoneNumber = "";
     export let authorName = "";
     export let amTemperature = 0;
+    export let amTemperatureID = "";
     export let pmTemperature = 0;
+    export let pmTemperatureID = "";
     export let id = "";
 
     export let editing = false; // true means that the row is under editing mode
@@ -60,13 +62,16 @@
     function editDone() {
         editing = false;
         db.collection("namemap").doc(id).update({ 
-            phoneNumber: phoneNumber,
+            phoneNumber,
             authorName
         }).then(() => {
             console.log("Document successfully edited");
         }).catch((error) => {
             console.error("Error editing document: ", error);
         });
+        // update temperature next, need to find the date
+        console.log("AM Temperature ID", amTemperatureID);
+        console.log("PM Temperature ID", pmTemperatureID);
     }
 </script>
 

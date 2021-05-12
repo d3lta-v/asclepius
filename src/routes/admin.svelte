@@ -21,7 +21,9 @@
         phoneNumber: string,
         authorName: string, // Name of author, based on phone number matching
         amTemperature: number | null,
+        amTemperatureID: string,
         pmTemperature: number | null,
+        pmTemperatureID: string,
         editing: boolean,
         newRow: boolean
         id: string | null
@@ -86,7 +88,9 @@
                         serialNo: data.serialNo,
                         authorName: data.authorName,
                         amTemperature: null,
+                        amTemperatureID: null,
                         pmTemperature: null,
+                        pmTemperatureID: null,
                         editing: false,
                         newRow: false,
                         id: change.doc.id
@@ -108,11 +112,17 @@
                         serialNo: data.serialNo,
                         authorName: data.authorName,
                         amTemperature: null,
+                        amTemperatureID: null,
                         pmTemperature: null,
+                        pmTemperatureID: null,
                         editing: false,
                         newRow: false,
                         id: change.doc.id
                     };
+                    // destroy and recreate listeners
+                    const indexListener = temperatureListeners.map(e => e.id).indexOf(change.doc.id);
+                    temperatureListeners[indexListener].listener();
+                    temperatureListeners[indexListener].listener = makeListener(change.doc.id, data.phoneNumber, dateSelected);
                 }
                 if (change.type === "removed") {
                     console.log("Removed record: ", change.doc.data());
@@ -122,7 +132,7 @@
                     temperatureListeners.splice(indexListener, indexListener);
                     temperatureRows.splice(indexRow,indexRow);
 
-                    // There's a bug concerning the removal of the last element in the array
+                    // TODO: There's a bug concerning the removal of the last element in the array
                 }
                 temperatureRows = temperatureRows;
             });
@@ -133,7 +143,9 @@
                 serialNo: temperatureRows.length+1,
                 authorName: "",
                 amTemperature: null,
+                amTemperatureID: null,
                 pmTemperature: null,
+                pmTemperatureID: null,
                 editing: false,
                 newRow: true,
                 id: null
@@ -148,7 +160,9 @@
             serialNo: temperatureRows.length+1,
             authorName: "",
             amTemperature: null,
+            amTemperatureID: null,
             pmTemperature: null,
+            pmTemperatureID: null,
             editing: false,
             newRow: true,
             id: null
@@ -216,6 +230,8 @@
                 }
                 let iterations = 0;
                 const phoneNumberMatching = (element: TemperatureRow) => element.phoneNumber === phoneNumber;
+                const tempIndex = temperatureRows.findIndex(phoneNumberMatching);
+
                 querySnapshot.forEach(doc => {
                     if (doc.exists) {
                         iterations++;
@@ -223,19 +239,26 @@
                         // Automatically change the temperature by finding it first
                         
                         const timestamp: firebase.firestore.Timestamp = doc.data().submitted;
+                        
                         if (isPM(timestamp)) {
-                            temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].pmTemperature = doc.data().temperature;
+                            temperatureRows[tempIndex].pmTemperature = doc.data().temperature;
+                            temperatureRows[tempIndex].pmTemperatureID = doc.id;
                         } else {
-                            temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = doc.data().temperature;
+                            temperatureRows[tempIndex].amTemperature = doc.data().temperature;
+                            temperatureRows[tempIndex].amTemperatureID = doc.id;
                         }
                     } else {
                         // doc.data() will be undefined in this case
                         console.log("No such document!");
                     }
                 });
+
+                // If there's no temperature records within this query
                 if (iterations < 1) {
-                    temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].pmTemperature = null;
-                    temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = null;
+                    temperatureRows[tempIndex].pmTemperature = null;
+                    temperatureRows[tempIndex].pmTemperatureID = null;
+                    temperatureRows[tempIndex].amTemperature = null;
+                    temperatureRows[tempIndex].amTemperatureID = null;
                 }
             }, (error) => {
                 // TODO: show errors to user
