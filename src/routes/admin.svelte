@@ -14,6 +14,8 @@
     const d = createEventDispatcher();
     let unsubAdminListener: () => any;
 
+    let dateSelected = "";
+
     interface TemperatureRow { // This interface describes the structure of a row of data
         serialNo: number,
         phoneNumber: string,
@@ -44,10 +46,9 @@
             db.collection("roles").doc(user.uid).get()
             .then((doc) => {
                 if (!doc.exists){
-                    console.log("user roles for this user does not exist, creating default user role")
+                    console.log("user roles for this user does not exist, creating default user role");
                     db.collection("roles").doc(user.uid).set({user: true});
                 } else {
-                    console.log("User roles: ", doc.data());
                     // Check if user is admin
                     if (!doc.data().admin) {
                         window.location.href = "/temp"; // kick the user out to temperature page
@@ -92,44 +93,10 @@
                     });
 
                     // add listener
-                    const upperDateBoundary = new Date();
-                    const lowerDateBoundary = new Date();
-
-                    upperDateBoundary.setHours(0,0,0,0);
-                    lowerDateBoundary.setHours(24,59,59,0);
-
                     temperatureListeners.push({
                         id: change.doc.id,
                         phoneNumber: data.phoneNumber,
-                        listener: db.collection("temperatures")
-                        .where("phoneNumber", "==", data.phoneNumber)
-                        .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
-                        .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
-                        .onSnapshot((querySnapshot) => {
-                            console.log("Snapshot listener created for phoneNumber: ", data.phoneNumber);
-                            if (querySnapshot.empty) {
-                                console.log("snapshot is empty");
-                            }
-                            querySnapshot.forEach(doc => {
-                                if (doc.exists) {
-                                    console.log(doc.id, " => ", doc.data());
-                                    // Automatically change the temperature by finding it first
-                                    const phoneNumberMatching = (element: TemperatureRow) => element.phoneNumber === doc.data().phoneNumber;
-                                    const timestamp: firebase.firestore.Timestamp = doc.data().submitted;
-                                    if (isPM(timestamp)) {
-                                        temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].pmTemperature = doc.data().temperature;
-                                    } else {
-                                        temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = doc.data().temperature;
-                                    }
-                                } else {
-                                    // doc.data() will be undefined in this case
-                                    console.log("No such document!");
-                                }
-                            });
-                        }, (error) => {
-                            // TODO: show errors to user
-                            console.error("Temperature query listener errored out: ", error);
-                        })
+                        listener: makeListener(change.doc.id, data.phoneNumber)
                     });
                 }
                 if (change.type === "modified") {
@@ -214,6 +181,67 @@
         return timeAsDate.getHours() >= 12;
     }
 
+    function dateSelecterChanged() {
+        console.log("Date selecter changed: ", dateSelected);
+
+        for (const iterator of temperatureListeners) {
+            // Deregister each listener
+            iterator.listener();
+            // Re-register them with the new date
+            // don't use push, just modify the existing one
+            iterator.listener = makeListener(iterator.id, iterator.phoneNumber, dateSelected);
+        }
+    }
+
+    function makeListener(id: string, phoneNumber: string, dateString?: string) {
+        const upperDateBoundary = new Date();
+        const lowerDateBoundary = new Date();
+
+        if (dateString) {
+            upperDateBoundary.setFullYear(Number(dateString.substring(0,4)), Number(dateString.substring(5,7))-1, Number(dateString.substring(8,10)));
+            lowerDateBoundary.setFullYear(Number(dateString.substring(0,4)), Number(dateString.substring(5,7))-1, Number(dateString.substring(8,10)));
+        }
+
+        upperDateBoundary.setHours(0,0,0,0);
+        lowerDateBoundary.setHours(23,59,59,0);
+
+        return db.collection("temperatures")
+            .where("phoneNumber", "==", phoneNumber)
+            .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
+            .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
+            .onSnapshot((querySnapshot) => {
+                console.log("Snapshot listener created for phoneNumber: ", phoneNumber);
+                if (querySnapshot.empty) {
+                    console.log("snapshot is empty");
+                }
+                let iterations = 0;
+                const phoneNumberMatching = (element: TemperatureRow) => element.phoneNumber === phoneNumber;
+                querySnapshot.forEach(doc => {
+                    if (doc.exists) {
+                        iterations++;
+                        console.log(doc.id, " => ", doc.data());
+                        // Automatically change the temperature by finding it first
+                        
+                        const timestamp: firebase.firestore.Timestamp = doc.data().submitted;
+                        if (isPM(timestamp)) {
+                            temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].pmTemperature = doc.data().temperature;
+                        } else {
+                            temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = doc.data().temperature;
+                        }
+                    } else {
+                        // doc.data() will be undefined in this case
+                        console.log("No such document!");
+                    }
+                });
+                if (iterations < 1) {
+                    temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].pmTemperature = null;
+                    temperatureRows[temperatureRows.findIndex(phoneNumberMatching)].amTemperature = null;
+                }
+            }, (error) => {
+                // TODO: show errors to user
+                console.error("Temperature query listener errored out: ", error);
+            })
+    }
 </script>
 
 <div class="container">
@@ -230,6 +258,12 @@
         </div>
     </div>
     <hr />
+    <div class="row">
+        <form>
+            <label for="dateSelector" style="display: inline-block;">Date Selection:</label>
+            <input type="date" id="dateSelector" bind:value={dateSelected} on:change={dateSelecterChanged}>
+        </form>
+    </div>
     <div class="row">
         <table class="u-full-width">
             <thead>
