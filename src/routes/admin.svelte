@@ -1,10 +1,12 @@
 <script lang="ts">
     // =======================================================================
     // Imports
-    import {auth, db} from "../services/firebase";
-    import {createEventDispatcher} from "svelte";
+    import { auth, db } from "../services/firebase";
+    import { createEventDispatcher } from "svelte";
     import InfoRow from "../components/InfoRow.svelte"
     import firebase from "firebase/app";
+    import download from "downloadjs";
+    import { Parser } from "json2csv";
 
     // =======================================================================
     // Variables and constants
@@ -265,6 +267,25 @@
                 console.error("Temperature query listener errored out: ", error);
             })
     }
+
+    function exportToday() {
+        // transform ordinary temperaturerows into a well-defined JSON object
+        let csvobject = [];
+        for (const iterator of temperatureRows) {
+            if (!iterator.newRow) { // do not push newRow objects
+                csvobject.push({
+                    "S/N": iterator.serialNo,
+                    "Phone Number": iterator.phoneNumber,
+                    "Name": iterator.authorName,
+                    "AM Temperature": iterator.amTemperature,
+                    "PM Temperature": iterator.pmTemperature
+                });
+            }
+        }
+
+        // turn JSON object into CSV
+        download(new Blob([new Parser().parse(csvobject)]),"test.csv","text/csv");
+    }
 </script>
 
 <div class="container">
@@ -282,10 +303,11 @@
     </div>
     <hr />
     <div class="row">
-        <form>
+        <form style="display: inline-block; margin-right: 1em;">
             <label for="dateSelector" style="display: inline-block;">Date Selection:</label>
             <input type="date" id="dateSelector" bind:value={dateSelected} on:change={dateSelecterChanged}>
         </form>
+        <button class="button u-pull-right" on:click={exportToday}>Export Today (.csv)</button>
     </div>
     <div class="row">
         <table class="u-full-width">
