@@ -288,7 +288,7 @@
     }
 </script>
 
-<div class="container">
+<div class="container" style="max-width: 1080px">
     <div class="row">
         <div class="six columns">
             <h5 style="margin-top: 1em; margin-bottom: 0; display: inline-block;">Asclepius Temperature Recording Portal</h5>
