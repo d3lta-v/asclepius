@@ -102,10 +102,18 @@
             </td>
         {:else}
             <td class="centred-td">{serialNo}</td>
-            <td>{phoneNumber}</td>
-            <td>{authorName}</td>
-            <td>{amTemperature}</td>
-            <td>{pmTemperature}</td>
+            <td style="color: {amTemperature >= 37.5 || pmTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {amTemperature >= 37.5 ? '700' : '400'}">
+                {phoneNumber}
+            </td>
+            <td style="color: {amTemperature >= 37.5 || pmTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {amTemperature >= 37.5 ? '700' : '400'}">
+                {authorName}
+            </td>
+            <td style="color: {amTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {amTemperature >= 37.5 ? '700' : '400'}">
+                {amTemperature}
+            </td>
+            <td style="color: {pmTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {pmTemperature >= 37.5 ? '700' : '400'}">
+                {pmTemperature}
+            </td>
             <td>
                 <button class="compactBtn" on:click={() => editing = true}>Edit</button>
                 <button class="compactBtn" on:click={shiftUp}>⬆️</button>
