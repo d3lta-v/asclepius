@@ -23,9 +23,9 @@
         phoneNumber: string,
         authorName: string, // Name of author, based on phone number matching
         amTemperature: number | null,
-        amTemperatureID: string,
+        amTemperatureID: string | null,
         pmTemperature: number | null,
-        pmTemperatureID: string,
+        pmTemperatureID: string | null,
         editing: boolean,
         newRow: boolean
         id: string | null
@@ -54,7 +54,7 @@
                     db.collection("roles").doc(user.uid).set({user: true});
                 } else {
                     // Check if user is admin
-                    if (!doc.data().admin) {
+                    if (doc.data()?.admin === false) {
                         window.location.href = "/temp"; // kick the user out to temperature page
                     }
                 }

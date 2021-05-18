@@ -13,8 +13,8 @@
     const d = createEventDispatcher();
 
     let isAuthenticated = false;
-    let captchaConfirmation: firebase.auth.ConfirmationResult = null;
-    let appVerifier: firebase.auth.RecaptchaVerifier = null;
+    let captchaConfirmation: firebase.auth.ConfirmationResult | null = null;
+    let appVerifier: firebase.auth.RecaptchaVerifier | null = null;
 
     // =======================================================================
     // UI elements
@@ -57,7 +57,7 @@
         if (!appVerifier) {
             appVerifier = new firebase.auth.RecaptchaVerifier('i_login', {
                 'size': 'invisible',
-                'callback': (response) => {
+                'callback': (response: string) => {
                     console.log("CAPTCHA solved: ", response);
                     // reCAPTCHA solved, initialise the login flow from here
                     login();
@@ -90,6 +90,10 @@
         }
         phoneNo = "+65" + phoneNo.trim();
 
+        if (appVerifier === null){
+            ui_errorMessageDisplay = "Internal server error, please contact support: ERR_APPVERIFIER_NULL";
+            return;
+        }
         console.log("App captcha verifier: ", appVerifier);
         auth.signInWithPhoneNumber(phoneNo, appVerifier)
         .then((confirmationResult) => {
@@ -106,6 +110,10 @@
     function confirmCaptchaCallback() {
         ui_verificationNumberField = document.getElementById("i_verificationNo") as HTMLInputElement;
         // TODO: should do some basic validation
+        if (captchaConfirmation === null) {
+            ui_errorMessageDisplay = "Internal server error, please contact support: ERR_CAPTCHACONF_NULL";
+            return;
+        }
         captchaConfirmation.confirm(ui_verificationNumberField.value).then((result) => {
             const user = result.user;
             console.log("User logged in as ", user);
@@ -124,7 +132,9 @@
         console.log("Logging out...")
         // destroy the captcha instance so that we can recreate it next time
         captchaConfirmation = null;
-        appVerifier.clear();
+        if (appVerifier) {
+            appVerifier.clear();
+        }
         appVerifier = null;
         // Actually sign out
         if (auth.currentUser) {

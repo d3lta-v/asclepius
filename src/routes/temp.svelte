@@ -54,7 +54,7 @@
                     db.collection("roles").doc(user.uid).set({user: true});
                 } else {
                     // Check if user is admin
-                    if (doc.data().admin == true) {
+                    if (doc.data()?.admin == true) {
                         ui_isAdminUser = true;
                     } else {
                         ui_isAdminUser = false;
@@ -105,6 +105,13 @@
         const temperature = Number(ui_temperatureField.value);
         if (temperature > 50 || temperature < 32 || isNaN(temperature)) {
             window.alert("Invalid temperature! Please key your body temperature in degrees Celcius with decimal points (e.g. 36.5)");
+            return;
+        }
+
+        // Validate that phoneNumber is correct
+        if (typeof user.phoneNumber != 'string') {
+            // basic type guarding
+            window.alert("Internal error: phone number is undefined");
             return;
         }
 

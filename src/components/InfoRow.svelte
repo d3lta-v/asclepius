@@ -6,11 +6,11 @@
     export let serialNo = 0;
     export let phoneNumber = "";
     export let authorName = "";
-    export let amTemperature = 0;
-    export let amTemperatureID = "";
-    export let pmTemperature = 0;
-    export let pmTemperatureID = "";
-    export let id = "";
+    export let amTemperature: number | null = 0;
+    export let amTemperatureID: string | null = "";
+    export let pmTemperature: number | null = 0;
+    export let pmTemperatureID: string | null = "";
+    export let id: string | null = "";
 
     export let editing = false; // true means that the row is under editing mode
     export let newRow = false;
@@ -18,6 +18,10 @@
     function shiftUp() {
         // This function will shift the row upwards
         serialNo--;
+        if (typeof id != 'string') {
+            console.warn("User tried to shift up a nonexistent ID!");
+            return; // TODO: maybe warn the user?
+        }
         db.collection("namemap").doc(id).update({ serialNo }).then(() => {
             console.log("Document successfully shifted up");
         }).catch((error) => {
@@ -28,6 +32,10 @@
     function shiftDown() {
         // This function will shift the row downwards
         serialNo++;
+        if (typeof id != 'string') {
+            console.warn("User tried to shift down a nonexistent ID!");
+            return;
+        }
         db.collection("namemap").doc(id).update({ serialNo }).then(() => {
             console.log("Document successfully shifted down");
         }).catch((error) => {
@@ -52,6 +60,10 @@
 
     function delet() {
         // This function will delete the row
+        if (typeof id != 'string') {
+            console.warn("User tried to delete down a nonexistent ID!");
+            return;
+        }
         db.collection("namemap").doc(id).delete().then(() => {
             console.log("Document successfully deleted");
         }).catch((error) => {
@@ -61,6 +73,10 @@
 
     function editDone() {
         editing = false;
+        if (typeof id != 'string') {
+            console.warn("User tried to edit a nonexistent ID!");
+            return;
+        }
         db.collection("namemap").doc(id).update({ 
             phoneNumber,
             authorName
@@ -102,16 +118,16 @@
             </td>
         {:else}
             <td class="centred-td">{serialNo}</td>
-            <td style="color: {amTemperature >= 37.5 || pmTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {amTemperature >= 37.5 ? '700' : '400'}">
+            <td style="color: {(amTemperature ?? 0) >= 37.5 || (pmTemperature ?? 0) >= 37.5 ? 'red' : 'black'}; font-weight: {(amTemperature ?? 0) >= 37.5 || (pmTemperature ?? 0) >= 37.5 ? '700' : '400'}">
                 {phoneNumber}
             </td>
-            <td style="color: {amTemperature >= 37.5 || pmTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {amTemperature >= 37.5 ? '700' : '400'}">
+            <td style="color: {(amTemperature ?? 0) >= 37.5 || (pmTemperature ?? 0) >= 37.5 ? 'red' : 'black'}; font-weight: {(amTemperature ?? 0) >= 37.5 || (pmTemperature ?? 0) >= 37.5 ? '700' : '400'}">
                 {authorName}
             </td>
-            <td style="color: {amTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {amTemperature >= 37.5 ? '700' : '400'}">
+            <td style="color: {(amTemperature ?? 0) >= 37.5 ? 'red' : 'black'}; font-weight: {(amTemperature ?? 0) >= 37.5 ? '700' : '400'}">
                 {amTemperature}
             </td>
-            <td style="color: {pmTemperature >= 37.5 ? 'red' : 'black'}; font-weight: {pmTemperature >= 37.5 ? '700' : '400'}">
+            <td style="color: {(pmTemperature ?? 0) >= 37.5 ? 'red' : 'black'}; font-weight: {(pmTemperature ?? 0) >= 37.5 ? '700' : '400'}">
                 {pmTemperature}
             </td>
             <td>
