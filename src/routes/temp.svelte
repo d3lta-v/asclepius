@@ -102,8 +102,8 @@
         }
 
         // Validate temperature
-        const temperature = parseFloat(ui_temperatureField.value);
-        if (temperature > 50 || temperature < 32) {
+        const temperature = Number(ui_temperatureField.value);
+        if (temperature > 50 || temperature < 32 || isNaN(temperature)) {
             window.alert("Invalid temperature! Please key your body temperature in degrees Celcius with decimal points (e.g. 36.5)");
             return;
         }
