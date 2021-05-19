@@ -6,8 +6,12 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import babel from "rollup-plugin-babel";
 
 const production = !process.env.ROLLUP_WATCH;
+
+// const legacy = !!process.env.IS_LEGACY_BUILD;
+const legacy = true;
 
 function serve() {
 	let server;
@@ -46,6 +50,7 @@ export default {
 				dev: !production
 			}
 		}),
+		
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
 		css({ output: 'bundle.css' }),
@@ -64,6 +69,31 @@ export default {
 			sourceMap: !production,
 			inlineSources: !production//,
 			// tsconfig: './tsconfig.json'
+		}),
+		legacy &&
+		babel({
+			extensions: [".js", ".mjs", ".html", ".svelte"],
+			runtimeHelpers: true,
+			exclude: ["node_modules/@babel/**"],
+			// include: ["public/**"],
+			presets: [
+				[
+					"@babel/preset-env",
+					{
+						targets: "> 0.25%, not dead",
+					},
+				],
+			],
+			plugins: [
+				"@babel/plugin-syntax-dynamic-import",
+				[
+					"@babel/plugin-transform-runtime",
+					{
+						useESModules: true,
+					},
+				],
+			],
+			compact: false,
 		}),
 
 		// In dev mode, call `npm run start` once
