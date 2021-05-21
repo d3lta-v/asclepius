@@ -58,6 +58,11 @@ service cloud.firestore {
     	allow read, write: if hasRole('admin');
     }
 
+    match /location/{loc} {
+      // The locations table can only be accessed by admins
+      allow read, write: if hasRole('admin');
+    }
+
     // Deny all, if other conditions fall through
     match /{document=**} {
       allow read, write: if false;

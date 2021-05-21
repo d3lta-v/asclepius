@@ -39,6 +39,12 @@
 
     let temperatureRows: TemperatureRow[] = [];
     let temperatureListeners: TemperatureListener[] = [];
+
+    // =======================================================================
+    // UI
+
+    // The following variables defines which button is unhighlighted and which are highlighted (primary)
+    let ui_exportBtn="button";
     
     // =======================================================================
     // Lifecycle
@@ -301,8 +307,14 @@
             <button class="button topbar-loginBtn" on:click={logout}>Log Out</button>
         </div>
     </div>
-    <hr />
+    <hr style="margin-bottom: 25px" />
+    <div class="row" style="margin-bottom: 20px">
+        <!--This row will act as a function selection bar-->
+        <button class={ui_exportBtn}>Export as CSV</button>
+    </div>
     <div class="row">
+        <!--This row acts as a contextual bar, which changes based on 
+            what's selected on the function selection bar-->
         <form style="display: inline-block; margin-right: 1em;">
             <label for="dateSelector" style="display: inline-block;">Date Selection:</label>
             <input type="date" id="dateSelector" bind:value={dateSelected} on:change={dateSelecterChanged}>
