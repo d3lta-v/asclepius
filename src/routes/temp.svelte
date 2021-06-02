@@ -195,6 +195,7 @@
         <div in:fade class="row">
             <p class="u-full-width" style="margin-top: 1em; text-align: center;">Verifying User...</p>
             <!--put a spinner here-->
+            <p style="color: #1EAEDB; font-size: 35px; text-align:center;"><i class="fas fa-spin fa-circle-notch"></i></p>
         </div>
     {:else}
         <!--User is authenticated-->
@@ -212,6 +213,7 @@
                         <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
                         <!-- <input class="button-primary" type="submit" value="Submit Temperature"> -->
                         <button class="button button-primary" type="submit"><i class="fas fa-chevron-circle-up"></i> Submit Temperature</button>
+                        <button class="button"><i class="fas fa-user-slash"></i> Report an absence</button>
                     </div>
                 </form>
             </div>
