@@ -22,12 +22,12 @@
     // Listener handles
     let unsubTemperatureListener: () => any;
 
-    interface User {
-        phoneNumber: string, author: string
-    }
+    // interface User {
+    //     phoneNumber: string, author: string
+    // }
 
-    interface TemperatureRecord extends User {
-        temperature: number, submitted: firebase.firestore.Timestamp
+    interface TemperatureRecord {
+        temperature: number, submitted: firebase.firestore.Timestamp, phoneNumber: string, author: string
     }
 
     // =======================================================================
@@ -183,10 +183,10 @@
         </div>
         <div class="six columns topbar">
             {#if ui_isAdminUser}
-                <a class="button button-primary" style="margin-right: 0em;" href="/temp">Take Temperature</a>
-                <a class="button" style="margin-right: 0em;" href="/admin">Admin Panel</a>
+                <a class="button button-primary" style="margin-right: 0em; font-size: 14px;" href="/temp"><i class="fas fa-thermometer-quarter"></i></a>
+                <a class="button" style="margin-right: 0em; font-size: 14px;" href="/admin"><i class="fas fa-columns"></i></a>
             {/if}
-            <button class="button topbar-loginBtn" on:click={logout}>Log Out</button>
+            <button class="button topbar-loginBtn" style="font-size: 14px;" on:click={logout}><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </div>
     <hr class="topbar-hr" />
@@ -210,7 +210,8 @@
                         <label for="i_temperature">Temperature in deg. Celsius (e.g. 36.6)</label>
                         <p style="margin-bottom: 1rem">Please submit your temperature after you have taken it with a personal thermometer</p>
                         <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
-                        <input class="button-primary" type="submit" value="Submit Temperature" id="i_login">
+                        <!-- <input class="button-primary" type="submit" value="Submit Temperature"> -->
+                        <button class="button button-primary" type="submit"><i class="fas fa-chevron-circle-up"></i> Submit Temperature</button>
                     </div>
                 </form>
             </div>

@@ -301,10 +301,10 @@
         </div>
         <div class="six columns topbar">
             {#if isAdminUser}
-            <a class="button" style="margin-right: 0em;" href="/temp">Take Temperature</a>
-            <a class="button button-primary" style="margin-right: 0em;" href="/admin">Admin Panel</a>
+                <a class="button" style="margin-right: 0em; font-size: 14px;" href="/temp"><i class="fas fa-thermometer-quarter"></i></a>
+                <a class="button button-primary" style="margin-right: 0em; font-size: 14px;" href="/admin"><i class="fas fa-columns"></i></a>
             {/if}
-            <button class="button topbar-loginBtn" on:click={logout}>Log Out</button>
+            <button class="button topbar-loginBtn" style="font-size: 14px;" on:click={logout}><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </div>
     <hr style="margin-bottom: 25px" />
