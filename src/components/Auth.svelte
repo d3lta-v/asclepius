@@ -22,7 +22,8 @@
     let ui_phoneNumberField: HTMLInputElement;
     let ui_verificationNumberField: HTMLInputElement;
     let ui_loginButton: HTMLButtonElement;
-    let ui_loading = false;
+    let ui_loadingLogin = false;
+    let ui_loadingVerification = false;
 
     // =======================================================================
     // Lifecycle
@@ -81,7 +82,7 @@
 
     function login() {
         ui_errorMessageDisplay = null; // reset error message display
-        ui_loading = true;
+        ui_loadingLogin = true;
 
         let phoneNo = ui_phoneNumberField.value;
         // perform some input validation
@@ -102,7 +103,7 @@
             // SMS sent. Prompt user to type the code from the message, then sign the user in with 
             // confirmationResult.confirm(code).
             captchaConfirmation = confirmationResult; // This triggers a UI change automatically
-            ui_loading = false;
+            ui_loadingLogin = false;
         }).catch((error) => {
             // Due to some error, SMS was not sent
             console.error(error);
@@ -111,10 +112,12 @@
     }
 
     function confirmCaptchaCallback() {
+        ui_loadingVerification = true;
         ui_verificationNumberField = document.getElementById("i_verificationNo") as HTMLInputElement;
         // TODO: should do some basic validation
         if (captchaConfirmation === null) {
             ui_errorMessageDisplay = "Internal server error, please contact support: ERR_CAPTCHACONF_NULL";
+            ui_loadingVerification = false;
             return;
         }
         captchaConfirmation.confirm(ui_verificationNumberField.value).then((result) => {
@@ -127,6 +130,8 @@
             // TODO: show error to user
             console.error(error);
             ui_errorMessageDisplay = error;
+        }).finally(() => {
+            ui_loadingVerification = false;
         });
     }
 
@@ -164,13 +169,13 @@
     {/if}
     <form in:fade on:submit|preventDefault>
         <div class="row">
-            <div class="three columns">
+            <div class="spinner-leftdiv">
                 <label for="i_phoneNo">Phone Number</label>
                 <input class="u-full-width" type="tel" placeholder="91234567" id="i_phoneNo" style="margin-bottom: 1em;">
                 <input class="button-primary" type="submit" value="Login" id="i_login">
             </div>
-            {#if ui_loading}
-            <div class="one column" style="margin-left: 1%">
+            {#if ui_loadingLogin}
+            <div class="spinner-rightdiv">
                 <p style="color: #1EAEDB; margin-top: 1.5em; font-size: 20px;"><i class="fas fa-spin fa-circle-notch"></i></p>
             </div>
             {/if}
@@ -178,13 +183,18 @@
     </form>
     {#if captchaConfirmation}
     <div in:slide class="row">
-        <div class="three columns">
+        <div class="spinner-leftdiv">
             <form on:submit|preventDefault={confirmCaptchaCallback}>
                 <label for="i_verificationNo" style="margin-top: 0.5em;">Verification Code:</label>
                 <input class="u-full-width" type="text" placeholder="123456" id="i_verificationNo" style="margin-bottom: 1em;">
                 <button class="button" type="submit">Verify</button>
             </form>
         </div>
+        {#if ui_loadingVerification}
+        <div class="spinner-rightdiv">
+            <p style="color: #1EAEDB; margin-top: 1.85em; font-size: 20px;"><i class="fas fa-spin fa-circle-notch"></i></p>
+        </div>
+        {/if}
     </div>
     {/if}
     {:else}

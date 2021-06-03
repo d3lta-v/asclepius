@@ -62,3 +62,26 @@
         margin-bottom: 3.5rem;
     }
 }
+
+/* Responsive spinner which has to be placed next to label */
+
+.spinner-leftdiv {
+    width: 86%;
+    float: left;
+    box-sizing: border-box;
+}
+
+.spinner-rightdiv {
+    width: 10%;
+    float: left;
+    box-sizing: border-box;
+    margin-left: 4%;
+}
+
+@media (min-width: 550px) {
+    .spinner-leftdiv { width: 22%; }
+    .spinner-rightdiv { 
+        width: 4.66666666667%;
+        margin-left: 1%;
+    }
+}
