@@ -178,10 +178,10 @@
 
 <div class="container">
     <div class="row">
-        <div class="six columns">
+        <div class="eight columns">
             <h5 style="margin-top: 1em; margin-bottom: 0; display: inline-block;">Asclepius Temperature Recording Portal</h5>
         </div>
-        <div class="six columns topbar">
+        <div class="four columns topbar">
             {#if ui_isAdminUser}
                 <a class="button button-primary" style="margin-right: 0em; font-size: 14px;" href="/temp"><i class="fas fa-thermometer-quarter"></i></a>
                 <a class="button" style="margin-right: 0em; font-size: 14px;" href="/admin"><i class="fas fa-columns"></i></a>

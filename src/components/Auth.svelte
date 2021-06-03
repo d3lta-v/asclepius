@@ -22,6 +22,7 @@
     let ui_phoneNumberField: HTMLInputElement;
     let ui_verificationNumberField: HTMLInputElement;
     let ui_loginButton: HTMLButtonElement;
+    let ui_loading = false;
 
     // =======================================================================
     // Lifecycle
@@ -80,6 +81,7 @@
 
     function login() {
         ui_errorMessageDisplay = null; // reset error message display
+        ui_loading = true;
 
         let phoneNo = ui_phoneNumberField.value;
         // perform some input validation
@@ -100,6 +102,7 @@
             // SMS sent. Prompt user to type the code from the message, then sign the user in with 
             // confirmationResult.confirm(code).
             captchaConfirmation = confirmationResult; // This triggers a UI change automatically
+            ui_loading = false;
         }).catch((error) => {
             // Due to some error, SMS was not sent
             console.error(error);
@@ -151,8 +154,6 @@
             });
         }
     }
-
-    // function google() {}
 </script>
 
 <div class="container">
@@ -168,21 +169,29 @@
                 <input class="u-full-width" type="tel" placeholder="91234567" id="i_phoneNo" style="margin-bottom: 1em;">
                 <input class="button-primary" type="submit" value="Login" id="i_login">
             </div>
+            {#if ui_loading}
+            <div class="one column" style="margin-left: 1%">
+                <p style="color: #1EAEDB; margin-top: 1.5em; font-size: 20px;"><i class="fas fa-spin fa-circle-notch"></i></p>
+            </div>
+            {/if}
         </div>
     </form>
     {#if captchaConfirmation}
     <div in:slide class="row">
         <div class="three columns">
-            <label for="i_verificationNo" style="margin-top: 0.5em;">Verification Code:</label>
-            <input class="u-full-width" type="text" placeholder="123456" id="i_verificationNo" style="margin-bottom: 1em;">
-            <button class="button" on:click={confirmCaptchaCallback}>Verify</button>
+            <form on:submit|preventDefault={confirmCaptchaCallback}>
+                <label for="i_verificationNo" style="margin-top: 0.5em;">Verification Code:</label>
+                <input class="u-full-width" type="text" placeholder="123456" id="i_verificationNo" style="margin-bottom: 1em;">
+                <button class="button" type="submit">Verify</button>
+            </form>
         </div>
     </div>
     {/if}
     {:else}
     <div class="row">
         <h5>Logged in</h5>
-        <p>You are being redirected to the correct page right now... if this takes too long, you can try to log out and try again with the log out button below:</p>
+        <p style="text-align: center;">You are being redirected to the correct page right now... if this takes too long, you can try to log out and try again with the log out button below:</p>
+        <p style="color: #1EAEDB; text-align: center; font-size: 20px;"><i class="fas fa-spin fa-circle-notch"></i></p>
         <button class="button-primary" type="button" on:click={logout}>Logout</button>
     </div>
     {/if}
