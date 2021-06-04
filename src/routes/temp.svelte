@@ -216,11 +216,14 @@
                         <label for="i_absencetype">Type of absence</label>
                         <p style="margin-bottom: 1rem">Please indicate your type of absence</p>
                         <select class="u-full-width" id="i_absencetype" style="margin-bottom: 1rem;">
-                            <option value="PANN">Leave</option>
-                            <option value="POIL">Off in Lieu</option>
-                            <option value="PMED">Medical Leave (MC)</option>
-                            <option value="PLOA">Leave of Absence</option>
-                            <option value="OTHR">Others</option>
+                            <option value="LEV">Leave</option>
+                            <option value="OIL">Off in Lieu</option>
+                            <option value="MED">Medical Leave (MC/MA)</option>
+                            <option value="LOA">Leave of Absence</option>
+                            <option value="CRS">On Course outside Workplace</option>
+                            <option value="DUY">On Duty</option>
+                            <option value="WFH">Working from Home (WFH/HBL)</option>
+                            <option value="OTH">Others</option>
                         </select>
                         <button class="button button-primary" type="submit"><i class="fas fa-user-slash"></i> Report absence</button>
                         <button class="button" on:click={() => {ui_absenceSelected = false}}>Back</button>
