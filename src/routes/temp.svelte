@@ -14,6 +14,7 @@
     let ui_isAdminUser = false;
     let ui_isVerified = false; // whether the user and temperature records are checked already
     let ui_temperatureSubmitted = false;
+    let ui_absenceSelected = false;
 
     // Variables
     let temperatureListenerCreated = false;
@@ -124,6 +125,10 @@
         db.collection("temperatures").add(record);
     }
 
+    function reportAbsence() {
+        console.log("placeholder function");
+    }
+
     function temperatureStatus(uid: string) {
         // This function checks if the user has already sent using a query listener
         // Get the today's date by setting the upper and lower bounds to look for (which by default are current time objects)
@@ -204,6 +209,24 @@
                 <p class="u-full-width" style="margin-top: 1em; text-align: center;">You have already submitted your temperature. Thank you!</p>
                 <button class="button" on:click={() => ui_temperatureSubmitted = false}>Submit Again</button>
             </div>
+        {:else if ui_absenceSelected}
+            <div in:fade class="row">
+                <form on:submit|preventDefault={reportAbsence}>
+                    <div class="six columns">
+                        <label for="i_absencetype">Type of absence</label>
+                        <p style="margin-bottom: 1rem">Please indicate your type of absence</p>
+                        <select class="u-full-width" id="i_absencetype" style="margin-bottom: 1rem;">
+                            <option value="PANN">Leave</option>
+                            <option value="POIL">Off in Lieu</option>
+                            <option value="PMED">Medical Leave (MC)</option>
+                            <option value="PLOA">Leave of Absence</option>
+                            <option value="OTHR">Others</option>
+                        </select>
+                        <button class="button button-primary" type="submit"><i class="fas fa-user-slash"></i> Report absence</button>
+                        <button class="button" on:click={() => {ui_absenceSelected = false}}>Back</button>
+                    </div>
+                </form>
+            </div>
         {:else}
             <div in:fade class="row">
                 <form on:submit|preventDefault={submitTemperature}>
@@ -213,7 +236,7 @@
                         <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
                         <!-- <input class="button-primary" type="submit" value="Submit Temperature"> -->
                         <button class="button button-primary" type="submit"><i class="fas fa-chevron-circle-up"></i> Submit Temperature</button>
-                        <button class="button"><i class="fas fa-user-slash"></i> Report an absence</button>
+                        <button class="button" on:click={() => {ui_absenceSelected=true;}}><i class="fas fa-user-slash"></i> Report an absence</button>
                     </div>
                 </form>
             </div>
