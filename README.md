@@ -4,14 +4,16 @@ Temperature taking with Firebase
 
 ## Get started
 
-Install the dependencies...
+Install the dependencies first.
 
 ```bash
 cd svelte-app
 npm install
 ```
 
-...then start [Rollup](https://rollupjs.org):
+Rename `firebase_config.sample.ts` to `firebase_config.ts` in `/src` and insert your Firebase credentials.
+
+After which, you can start [Rollup](https://rollupjs.org):
 
 ```bash
 npm run dev
