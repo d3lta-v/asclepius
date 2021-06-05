@@ -100,7 +100,7 @@
         <td>N/A</td>
         <td>N/A</td>
         <td>
-            <button class="compactBtn" on:click={add}>Add</button>
+            <button class="compactBtn" type="button" on:click={add}>Add</button>
         </td>
     {:else}
         <!--Data already exists-->
@@ -111,10 +111,10 @@
             <td><input class="number-field" type="number" placeholder="AM Temp" bind:value={amTemperature} step="0.1" max="45" min="30"></td>
             <td><input class="number-field" type="number" placeholder="PM Temp" bind:value={pmTemperature} step="0.1" max="45" min="30"></td>
             <td>
-                <button class="compactBtn" on:click={editDone}>Done</button>
-                <button class="compactBtn" on:click={shiftUp}>⬆️</button>
-                <button class="compactBtn" on:click={shiftDown}>⬇️</button>
-                <button class="compactBtn" on:click={delet}>🗑️</button>
+                <button class="compactBtn" type="button" on:click={editDone}>Done</button>
+                <button class="compactBtn" type="button" on:click={shiftUp}>⬆️</button>
+                <button class="compactBtn" type="button" on:click={shiftDown}>⬇️</button>
+                <button class="compactBtn" type="button" on:click={delet}>🗑️</button>
             </td>
         {:else}
             <td class="centred-td">{serialNo}</td>
@@ -131,10 +131,10 @@
                 {pmTemperature}
             </td>
             <td>
-                <button class="compactBtn" on:click={() => editing = true}>Edit</button>
-                <button class="compactBtn" on:click={shiftUp}>⬆️</button>
-                <button class="compactBtn" on:click={shiftDown}>⬇️</button>
-                <button class="compactBtn" on:click={delet}>🗑️</button>
+                <button class="compactBtn" type="button" on:click={() => editing = true}>Edit</button>
+                <button class="compactBtn" type="button" on:click={shiftUp}>⬆️</button>
+                <button class="compactBtn" type="button" on:click={shiftDown}>⬇️</button>
+                <button class="compactBtn" type="button" on:click={delet}>🗑️</button>
             </td>
         {/if}
     {/if}

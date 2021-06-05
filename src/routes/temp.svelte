@@ -224,7 +224,7 @@
                 <a class="button button-primary" style="margin-right: 0em; font-size: 14px;" href="/temp"><i class="fas fa-thermometer-quarter"></i></a>
                 <a class="button" style="margin-right: 0em; font-size: 14px;" href="/admin"><i class="fas fa-columns"></i></a>
             {/if}
-            <button class="button topbar-loginBtn" style="font-size: 14px;" on:click={logout}><i class="fas fa-sign-out-alt"></i></button>
+            <button type="button" class="button topbar-loginBtn" style="font-size: 14px;" on:click={logout}><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </div>
     <hr class="topbar-hr" />
@@ -240,7 +240,7 @@
         {#if ui_temperatureSubmitted}
             <div in:fade class="row">
                 <p class="u-full-width" style="margin-top: 1em; text-align: center;">You have already submitted your temperature. Thank you!</p>
-                <button class="button" on:click={() => ui_temperatureSubmitted = false}>Submit Again</button>
+                <button type="button" class="button" on:click={() => ui_temperatureSubmitted = false}>Submit Again</button>
             </div>
         {:else if ui_absenceSelected}
             <div in:fade class="row">
@@ -269,7 +269,7 @@
                             </div>
                         </div>
                         <button class="button button-primary" type="submit"><i class="fas fa-user-slash"></i> Report absence</button>
-                        <button class="button" on:click={() => {ui_absenceSelected = false}}>Back</button>
+                        <button class="button" type="button" on:click={() => {ui_absenceSelected = false}}>Back</button>
                     </div>
                 </form>
             </div>
@@ -282,7 +282,7 @@
                         <input class="u-full-width" type="number" placeholder="36.6" id="i_temperature" style="margin-bottom: 1em;" step="0.1" max="45" min="30">
                         <!-- <input class="button-primary" type="submit" value="Submit Temperature"> -->
                         <button class="button button-primary" type="submit"><i class="fas fa-chevron-circle-up"></i> Submit Temperature</button>
-                        <button class="button" on:click={() => {ui_absenceSelected=true;}}><i class="fas fa-user-slash"></i> Report an absence</button>
+                        <button class="button" type="button" on:click={() => {ui_absenceSelected=true;}}><i class="fas fa-user-slash"></i> Report an absence</button>
                     </div>
                 </form>
             </div>

@@ -304,13 +304,13 @@
                 <a class="button" style="margin-right: 0em; font-size: 14px;" href="/temp"><i class="fas fa-thermometer-quarter"></i></a>
                 <a class="button button-primary" style="margin-right: 0em; font-size: 14px;" href="/admin"><i class="fas fa-columns"></i></a>
             {/if}
-            <button class="button topbar-loginBtn" style="font-size: 14px;" on:click={logout}><i class="fas fa-sign-out-alt"></i></button>
+            <button class="button topbar-loginBtn" type="button" style="font-size: 14px;" on:click={logout}><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </div>
     <hr style="margin-bottom: 25px" />
     <div class="row" style="margin-bottom: 20px">
         <!--This row will act as a function selection bar-->
-        <button class={ui_exportBtn}>Export as CSV</button>
+        <button type="button" class={ui_exportBtn}>Export as CSV</button>
     </div>
     <div class="row">
         <!--This row acts as a contextual bar, which changes based on 
@@ -319,7 +319,7 @@
             <label for="dateSelector" style="display: inline-block;">Date Selection:</label>
             <input type="date" id="dateSelector" bind:value={dateSelected} on:change={dateSelecterChanged}>
         </form>
-        <button class="button u-pull-right" on:click={exportToday}>Export Today (.csv)</button>
+        <button type="button" class="button u-pull-right" on:click={exportToday}>Export Today (.csv)</button>
     </div>
     <div class="row">
         <table class="u-full-width">
