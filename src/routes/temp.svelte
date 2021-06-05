@@ -4,7 +4,7 @@
     import { auth, db } from "../services/firebase";
     import { fade } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
-    import { afterUpdate, onDestroy } from 'svelte';
+    import { afterUpdate, onMount } from 'svelte';
     import firebase from "firebase/app";
 
     // =======================================================================
@@ -19,6 +19,8 @@
     // Variables
     let temperatureListenerCreated = false;
     const d = createEventDispatcher();
+    let absenceStartString = "";
+    let absenceEndString = "";
 
     // Listener handles
     let unsubTemperatureListener: () => any;
@@ -28,7 +30,13 @@
     // }
 
     interface TemperatureRecord {
-        temperature: number, submitted: firebase.firestore.Timestamp, phoneNumber: string, author: string
+        temperature: number | null,                         // Temperature of the person (optional)
+        submitted: firebase.firestore.Timestamp,            // Submitted timestamp
+        phoneNumber: string,                                // Phone number of the person
+        author: string,                                     // UID of the person
+        absence: string | null,                             // Absence in lieu of temperature record (optional)
+        effectiveFrom: firebase.firestore.Timestamp,        // Effective from timestamp (00:00 of local time)
+        effectiveTo: firebase.firestore.Timestamp           // Effective to timestamp (23:59 of local time)
     }
 
     // =======================================================================
@@ -37,6 +45,17 @@
 
     // =======================================================================
     // Lifecycle
+
+    onMount(() => {
+        const todaysDate = new Date();
+        const year = String(todaysDate.getFullYear());
+        const month = String(todaysDate.getMonth()+1).padStart(2, '0');
+        const day = String(todaysDate.getDate()).padStart(2, '0');
+        const combined = year + "-" + month + "-" + day;
+        absenceStartString = combined;
+        absenceEndString = combined;
+    });
+
     afterUpdate(() => {
         console.log("afterupdate called in temp.svelte");
         ui_temperatureField = document.getElementById("i_temperature") as HTMLInputElement;
@@ -116,17 +135,31 @@
             return;
         }
 
+        // Only use today's date as effective from and to
+        const effectiveFromDate = new Date();
+        const effectiveToDate = new Date();
+        effectiveFromDate.setHours(0,0,0,0);
+        effectiveToDate.setHours(23,59,59,0);
+
         const record: TemperatureRecord = {
             temperature: temperature,
             submitted: firebase.firestore.Timestamp.now(),
             phoneNumber: user.phoneNumber,
-            author: user.uid
+            author: user.uid,
+            absence: null,
+            effectiveFrom: firebase.firestore.Timestamp.fromDate(effectiveFromDate),
+            effectiveTo: firebase.firestore.Timestamp.fromDate(effectiveToDate)
         }
         db.collection("temperatures").add(record);
     }
 
     function reportAbsence() {
         console.log("placeholder function");
+    }
+
+    function absDateChanged() {
+        console.log(absenceStartString);
+        console.log(absenceEndString);
     }
 
     function temperatureStatus(uid: string) {
@@ -225,6 +258,16 @@
                             <option value="WFH">Working from Home (WFH/HBL)</option>
                             <option value="OTH">Others</option>
                         </select>
+                        <div style="display: flex; flex-wrap: wrap; margin-bottom: 2rem; justify-content: space-around;">
+                            <div style="order: 1;">
+                                <label for="startDate">Start Date:</label>
+                                <input type="date" id="startDate" bind:value={absenceStartString} on:change={absDateChanged}>
+                            </div>
+                            <div style="order: 2;">
+                                <label for="endDate">End Date:</label>
+                                <input type="date" id="endDate" bind:value={absenceEndString} on:change={absDateChanged}>
+                            </div>
+                        </div>
                         <button class="button button-primary" type="submit"><i class="fas fa-user-slash"></i> Report absence</button>
                         <button class="button" on:click={() => {ui_absenceSelected = false}}>Back</button>
                     </div>
