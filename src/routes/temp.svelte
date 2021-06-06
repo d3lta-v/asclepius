@@ -35,8 +35,7 @@
         phoneNumber: string,                                // Phone number of the person
         author: string,                                     // UID of the person
         absence: string | null,                             // Absence in lieu of temperature record (optional)
-        effectiveFrom: firebase.firestore.Timestamp,        // Effective from timestamp (00:00 of local time)
-        effectiveTo: firebase.firestore.Timestamp           // Effective to timestamp (23:59 of local time)
+        effectiveDates: string[]                            // Array of dates in ISO8601 format (2021-06-30)
     }
 
     // =======================================================================
@@ -135,11 +134,8 @@
             return;
         }
 
-        // Only use today's date as effective from and to
-        const effectiveFromDate = new Date();
-        const effectiveToDate = new Date();
-        effectiveFromDate.setHours(0,0,0,0);
-        effectiveToDate.setHours(23,59,59,0);
+        const currentDate = new Date();
+        const todayString = String(currentDate.getFullYear())+"-"+String(currentDate.getMonth()+1).padStart(2,'0')+"-"+String(currentDate.getDate()).padStart(2,'0');
 
         const record: TemperatureRecord = {
             temperature: temperature,
@@ -147,8 +143,7 @@
             phoneNumber: user.phoneNumber,
             author: user.uid,
             absence: null,
-            effectiveFrom: firebase.firestore.Timestamp.fromDate(effectiveFromDate),
-            effectiveTo: firebase.firestore.Timestamp.fromDate(effectiveToDate)
+            effectiveDates: [todayString]
         }
         db.collection("temperatures").add(record);
     }
