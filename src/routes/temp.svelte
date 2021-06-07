@@ -21,6 +21,7 @@
     const d = createEventDispatcher();
     let absenceStartString = "";
     let absenceEndString = "";
+    let absenceType = "LEV";
 
     // Listener handles
     let unsubTemperatureListener: () => any;
@@ -135,7 +136,9 @@
         }
 
         const currentDate = new Date();
-        const todayString = String(currentDate.getFullYear())+"-"+String(currentDate.getMonth()+1).padStart(2,'0')+"-"+String(currentDate.getDate()).padStart(2,'0');
+        const todayString = String(currentDate.getFullYear())
+                            +"-"+String(currentDate.getMonth()+1).padStart(2,'0')
+                            +"-"+String(currentDate.getDate()).padStart(2,'0');
 
         const record: TemperatureRecord = {
             temperature: temperature,
@@ -149,7 +152,42 @@
     }
 
     function reportAbsence() {
-        console.log("placeholder function");
+        // Get user information
+        const user = auth.currentUser
+        if (!user) {
+            console.log("User is null");
+            window.location.href = "/";
+            return;
+        }
+
+        // Validate that phoneNumber is correct
+        if (typeof user.phoneNumber != 'string') {
+            // basic type guarding
+            window.alert("Internal error: phone number is undefined");
+            return;
+        }
+
+        // Get all the dates from absenceStartString to absenceEndString
+        let dates = generateDatesBetween(absenceStartString, absenceEndString);
+        // TODO WARNING: this may not account for DST properly!
+        let datesStr = dates.map((v)=>v.toISOString().slice(0,10))
+
+        const record: TemperatureRecord = {
+            temperature: null,
+            submitted: firebase.firestore.Timestamp.now(),
+            phoneNumber: user.phoneNumber,
+            author: user.uid,
+            absence: absenceType,
+            effectiveDates: datesStr
+        }
+        db.collection("temperatures").add(record);
+    }
+
+    function generateDatesBetween(start: string, end: string) {
+        for(var arr=[],dt=new Date(start); dt<=new Date(end); dt.setDate(dt.getDate()+1)){
+            arr.push(new Date(dt));
+        }
+        return arr;
     }
 
     function absDateChanged() {
@@ -243,7 +281,7 @@
                     <div class="six columns">
                         <label for="i_absencetype">Type of absence</label>
                         <p style="margin-bottom: 1rem">Please indicate your type of absence</p>
-                        <select class="u-full-width" id="i_absencetype" style="margin-bottom: 1rem;">
+                        <select class="u-full-width" id="i_absencetype" style="margin-bottom: 1rem;" bind:value={absenceType}>
                             <option value="LEV">Leave</option>
                             <option value="OIL">Off in Lieu</option>
                             <option value="MED">Medical Leave (MC/MA)</option>
