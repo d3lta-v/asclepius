@@ -31,12 +31,19 @@
     // }
 
     interface TemperatureRecord {
-        temperature: number | null,                         // Temperature of the person (optional)
+        temperature?: number,                               // Temperature of the person (optional)
         submitted: firebase.firestore.Timestamp,            // Submitted timestamp
         phoneNumber: string,                                // Phone number of the person
         author: string,                                     // UID of the person
-        absence: string | null,                             // Absence in lieu of temperature record (optional)
+        absence?: string,                                   // Absence in lieu of temperature record (optional)
         effectiveDates: string[]                            // Array of dates in ISO8601 format (2021-06-30)
+    }
+
+    function isTemperatureRecord(obj: any): obj is TemperatureRecord {
+        return typeof obj.submitted == 'object'
+        && typeof obj.phoneNumber == 'string'
+        && typeof obj.author == 'string'
+        && Array.isArray(obj.effectiveDates);
     }
 
     // =======================================================================
@@ -47,13 +54,9 @@
     // Lifecycle
 
     onMount(() => {
-        const todaysDate = new Date();
-        const year = String(todaysDate.getFullYear());
-        const month = String(todaysDate.getMonth()+1).padStart(2, '0');
-        const day = String(todaysDate.getDate()).padStart(2, '0');
-        const combined = year + "-" + month + "-" + day;
-        absenceStartString = combined;
-        absenceEndString = combined;
+        const todaysDate = generateTodayDateStr();
+        absenceStartString = todaysDate;
+        absenceEndString = todaysDate;
     });
 
     afterUpdate(() => {
@@ -62,6 +65,15 @@
     });
 
     // onDestroy(unsubTemperatureListener);
+
+    function generateTodayDateStr() {
+        const todaysDate = new Date();
+        const year = String(todaysDate.getFullYear());
+        const month = String(todaysDate.getMonth()+1).padStart(2, '0');
+        const day = String(todaysDate.getDate()).padStart(2, '0');
+        const combined = year + "-" + month + "-" + day;
+        return combined;
+    }
 
     // Login check
     auth.onAuthStateChanged(user => {
@@ -145,7 +157,6 @@
             submitted: firebase.firestore.Timestamp.now(),
             phoneNumber: user.phoneNumber,
             author: user.uid,
-            absence: null,
             effectiveDates: [todayString]
         }
         db.collection("temperatures").add(record);
@@ -173,7 +184,6 @@
         let datesStr = dates.map((v)=>v.toISOString().slice(0,10))
 
         const record: TemperatureRecord = {
-            temperature: null,
             submitted: firebase.firestore.Timestamp.now(),
             phoneNumber: user.phoneNumber,
             author: user.uid,
@@ -198,6 +208,7 @@
     function temperatureStatus(uid: string) {
         // This function checks if the user has already sent using a query listener
         // Get the today's date by setting the upper and lower bounds to look for (which by default are current time objects)
+        
         const upperDateBoundary = new Date();
         const lowerDateBoundary = new Date();
 
@@ -218,25 +229,54 @@
             return;
         }
 
+        const today = generateTodayDateStr();
+
         // Create date range to query
         unsubTemperatureListener = db.collection("temperatures")
         .where("author", "==", uid)
-        .where("submitted", "<=", firebase.firestore.Timestamp.fromDate(lowerDateBoundary))
-        .where("submitted", ">=", firebase.firestore.Timestamp.fromDate(upperDateBoundary))
+        .where("effectiveDates", "array-contains", today)
         .onSnapshot((querySnapshot) => {
-            console.log("Snapshot listener received: ");
             if (querySnapshot.empty) {
                 console.log("snapshot is empty");
                 ui_temperatureSubmitted = false;
-            } else {
-                ui_temperatureSubmitted = true;
             }
+            let currentRecords: TemperatureRecord[] = [];
             querySnapshot.forEach(doc => {
-                if (doc.exists) {
-                    console.log(doc.id, " => ", doc.data());
+                if (doc.exists && isTemperatureRecord(doc.data())) {
+                    if (typeof doc.data().temperature == 'number' || typeof doc.data().absence == 'string') {
+                        // temperature record exists
+                        currentRecords.push(doc.data() as TemperatureRecord);
+                    } else {
+                        // invalid data, discard and warn
+                        console.warn("Invalid data detected: ", doc.data());
+                    }
                 } else {
                     // doc.data() will be undefined in this case
-                    console.log("No such document!");
+                    console.log("Document faulty: ", doc.data());
+                }
+                if (currentRecords.length === querySnapshot.size) { // End of forEach
+                    // managed to get the full snapshot, able to analyze it now
+                    // perform pruning to check if today's temperature/absence has been covered
+                    // check if there's at least one entry covering absences. if there is, ignore it completely.
+                    let absenceExists = false;
+                    let temperatureTimeValid = false;
+                    for (const record of currentRecords) {
+                        if (record.absence) {
+                            absenceExists = true;
+                        } else {
+                            // else, check if any of the entries in question have effectiveTo and effectiveFrom dates
+                            const submittedTimestamp = record.submitted.toDate();
+                            temperatureTimeValid = submittedTimestamp >= upperDateBoundary && submittedTimestamp <= lowerDateBoundary;
+                        }
+                    }
+                    if (absenceExists || temperatureTimeValid) {
+                        ui_temperatureSubmitted = true;
+                        console.log("Entry exists");
+                    } else {
+                        console.log("No entry");
+                    }
+                } else {
+                    console.warn("Currentrecords != querySnapshot. There's problematic data here");
                 }
             });
             ui_isVerified = true;
