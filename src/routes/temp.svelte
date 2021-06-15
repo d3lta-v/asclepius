@@ -64,17 +64,6 @@
         ui_temperatureField = document.getElementById("i_temperature") as HTMLInputElement;
     });
 
-    // onDestroy(unsubTemperatureListener);
-
-    function generateTodayDateStr() {
-        const todaysDate = new Date();
-        const year = String(todaysDate.getFullYear());
-        const month = String(todaysDate.getMonth()+1).padStart(2, '0');
-        const day = String(todaysDate.getDate()).padStart(2, '0');
-        const combined = year + "-" + month + "-" + day;
-        return combined;
-    }
-
     // Login check
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -105,6 +94,15 @@
 
     // =======================================================================
     // Functions
+
+    function generateTodayDateStr() {
+        const todaysDate = new Date();
+        const year = String(todaysDate.getFullYear());
+        const month = String(todaysDate.getMonth()+1).padStart(2, '0');
+        const day = String(todaysDate.getDate()).padStart(2, '0');
+        const combined = year + "-" + month + "-" + day;
+        return combined;
+    }
 
     function logout() {
         // ui_errorMessageDisplay = null;
