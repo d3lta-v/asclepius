@@ -4,6 +4,7 @@
     import { auth } from "../services/firebase";
     import { createEventDispatcher } from "svelte";
     import AdminSingleDay from "../components/AdminSingleDay.svelte"
+    import AdminWeek from "../components/AdminWeek.svelte"
 
     // =======================================================================
     // Variables and constants
@@ -17,10 +18,7 @@
     // UI
 
     // The following variables defines which button is unhighlighted and which are highlighted (primary)
-    let ui_tabButtons = {
-        day: "button button-primary",
-        week: "button"
-    };
+    let ui_tabButtons = "day";
     
     // =======================================================================
     // Lifecycle
@@ -64,11 +62,12 @@
     <hr style="margin-bottom: 25px" />
     <div class="row" style="margin-bottom: 20px">
         <!--This row will act as a function selection bar-->
-        <button type="button" class={ui_tabButtons.day}><i class="fas fa-calendar-day"></i> Day View</button>
+        <button type="button" id="dayBtn" class="{ui_tabButtons === 'day' ? "button button-primary" : "button"}" on:click={() => ui_tabButtons = 'day'}><i class="fas fa-calendar-day"></i> Day View</button>
+        <button type="button" id="weekBtn" class="{ui_tabButtons === 'week' ? "button button-primary" : "button"}" on:click={() => ui_tabButtons = 'week'}><i class="fas fa-calendar-week"></i> Week View</button>
     </div>
-    {#if ui_tabButtons.day=="button button-primary"}
+    {#if ui_tabButtons === 'day'}
         <AdminSingleDay></AdminSingleDay>
-    {:else if ui_tabButtons.week=="button button-primary"}
-        <!--Week view placeholder-->
+    {:else if ui_tabButtons === 'week'}
+        <AdminWeek></AdminWeek>
     {/if}
 </div>

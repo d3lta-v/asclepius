@@ -4,7 +4,7 @@
     import firebase from "firebase/app";
     import download from "downloadjs";
     import { Parser } from "json2csv";
-    import { onMount, onDestroy } from 'svelte';
+    
 
     let dateSelected = "";
     let adminListenerCreated = false;
@@ -32,13 +32,7 @@
     let temperatureRows: TemperatureRow[] = [];
     let temperatureListeners: TemperatureListener[] = [];
 
-    onMount(()=>{
-        console.log("Admin onmount");
-    });
-
-    onDestroy(()=>{
-        console.log("Admin ondestroy");
-    });
+    
 
     // Login check
     auth.onAuthStateChanged(user => {
