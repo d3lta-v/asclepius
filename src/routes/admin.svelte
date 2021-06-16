@@ -19,9 +19,6 @@
 
     // The following variables defines which button is unhighlighted and which are highlighted (primary)
     let ui_tabButtons = "day";
-    
-    // =======================================================================
-    // Lifecycle
 
     // =======================================================================
     // Functions

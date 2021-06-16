@@ -1,11 +1,14 @@
 <script lang="ts">
+    // =======================================================================
+    // Imports
     import InfoRow from "./InfoRow.svelte"
     import { auth, db } from "../services/firebase";
     import firebase from "firebase/app";
     import download from "downloadjs";
     import { Parser } from "json2csv";
-    
 
+    // =======================================================================
+    // Variables and constants
     let dateSelected = "";
     let adminListenerCreated = false;
     let unsubAdminListener: () => any;
@@ -23,6 +26,22 @@
         id: string | null
     };
 
+    interface WeekRow {
+        serialNo: number,
+        phoneNumber: string,
+        authorName: string,
+        monday: Day,
+        tuesday: Day,
+        wednesday: Day,
+        thursday: Day,
+        friday: Day
+    }
+
+    interface Day {
+        AM: string,
+        PM: string
+    }
+
     interface TemperatureListener {
         id: string,
         phoneNumber: string,
@@ -30,9 +49,11 @@
     }
 
     let temperatureRows: TemperatureRow[] = [];
+    let weekRows: WeekRow[] = [];
     let temperatureListeners: TemperatureListener[] = [];
 
-    
+    // =======================================================================
+    // Lifecycle
 
     // Login check
     auth.onAuthStateChanged(user => {
@@ -59,6 +80,7 @@
         }
     });
 
+    // Create the master listener
     function createAdminListener() {
         unsubAdminListener = db.collection("namemap").orderBy("serialNo").onSnapshot((snapshot) => {
             // Pop the last "new row" element
@@ -159,12 +181,14 @@
         temperatureRows = temperatureRows;
     }
 
+    // Helper function for time AM/PM
     function isPM(timestamp: firebase.firestore.Timestamp) {
         const timeAsDate = timestamp.toDate();
         //TODO: does this properly take into account timezones?
         return timeAsDate.getHours() >= 12;
     }
 
+    // Date selector has changed listener
     function dateSelecterChanged() {
         console.log("Date selecter changed: ", dateSelected);
 
@@ -177,6 +201,7 @@
         }
     }
 
+    // makeListener creates a listener on a per-row basis (one listener per row)
     function makeListener(id: string, phoneNumber: string, dateString?: string) {
         const upperDateBoundary = new Date();
         const lowerDateBoundary = new Date();
@@ -236,7 +261,9 @@
             })
     }
 
-    function exportToday() {
+    function exportWeek() {
+        console.log("DUMMY FUNCTION exportWeek CALLED");
+        /*
         // transform ordinary temperaturerows into a well-defined JSON object
         let csvobject = [];
         for (const iterator of temperatureRows) {
@@ -253,16 +280,17 @@
 
         // turn JSON object into CSV
         download(new Blob([new Parser().parse(csvobject)]),"test.csv","text/csv");
+        */
     }
 
 </script>
 
 <div class="row">
     <form style="display: inline-block; margin-right: 1em;">
-        <label for="dateSelector" style="display: inline-block;">Date Selection:</label>
+        <label for="dateSelector" style="display: inline-block;">Week Selection:</label>
         <input type="date" id="dateSelector" bind:value={dateSelected} on:change={dateSelecterChanged}>
     </form>
-    <button type="button" class="button u-pull-right" on:click={exportToday}>Export Today (.csv)</button>
+    <button type="button" class="button u-pull-right" on:click={exportWeek}>Export Week (.csv)</button>
 </div>
 <div class="row">
     <table class="u-full-width">
@@ -277,8 +305,8 @@
             </tr>
         </thead>
         <tbody>
-            {#if temperatureRows.length > 0}
-                {#each temperatureRows as temp}
+            {#if weekRows.length > 0}
+                {#each weekRows as temp}
                     <InfoRow {...temp}></InfoRow>
                 {/each}
             {:else}
